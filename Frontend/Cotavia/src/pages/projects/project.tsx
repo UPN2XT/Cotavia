@@ -1,32 +1,27 @@
 import { useState, useEffect } from "react"
-import PathNone from "./components/pathNone"
 import { useParams } from "react-router"
 import useCrf from "../../hooks/useCrf"
 import applicationData from "../../data"
 import CodeEditor from "./components/codeEditor"
-import CreateField from "./components/createField"
+import DirectoryViewer from "./components/DirectoryViewer"
+import { Folder } from "./components/DirectoryViewer"
 
-interface Folder 
-{
-    name: string,
-    folders: SubFolders,
-    files: SubFiles 
-}
-
-interface SubFolders
-{
-    [key: string]: Folder
-}
-
-interface SubFiles
-{
-    [key: string]: string
-}
 
 
 export default function() {
 
-    const [dictionary, setDictionary] = useState<Folder>({name: '', folders: {}, files: {}})
+    const [dictionary, setDictionary] = useState<Folder>(
+        {
+            name: '1', 
+            folders: {
+                '2': {
+                    name: '2',
+                    folders: {},
+                    files: {}
+                }
+            }, 
+            files: {'sub': 'hello'}}
+    )
     const {id} = useParams()
     const [codeText, setCodeText] = useState<string>("")
     const [currentPath, setCurentPath] = useState<string>("")
@@ -48,43 +43,15 @@ export default function() {
         .then(res => console.log(res.status))
         .then(() => updateCode())
     }
-    const createFilelocation = (root: Folder, path: string, isRoot: boolean) => {
-        const subFolders = []
-        const rootRef = isRoot? '': path+`${root.name}/`
-        if (root.folders != null) 
-            for (const key in root.folders)
-                subFolders.push((<li>{createFilelocation(root.folders[key], rootRef, false)}</li>))
-        const subFiles = []
-        if (root.files != null)
-            for (const key in root.files)
-                subFiles.push((<PathNone name={key} path={rootRef+key} folder={false} data={root.files[key]} updateFunctionText={setCodeText} updateFunctionPath={setCurentPath} />))
-        
-        
-        return (
-            <>
-                <PathNone name={root.name} path={path+root.name} folder={true} data="" updateFunctionText={setCodeText} updateFunctionPath={setCurentPath}/>
-                <CreateField updateCode={updateCode} id={String(id)} rootRef={rootRef}/>
-                <ul>
-                    {subFolders}
-                </ul>
-                <ul>
-                    {subFiles}
-                </ul>
-            </>
-        )
-    }
 
     useEffect(() => {
         updateCode()
     }, [])
     return (
-        <div>
-            <button onClick={updateCode}>refresh</button> <br />
-            <CodeEditor data={codeText} onChange={(e) => setCodeText(e.currentTarget.value)}/>
-            <p>{currentPath}</p>
+        <div className="flex gap-4 h-full">
+            <DirectoryViewer updateCode={updateCode} id={id} setCodeText={setCodeText} setCurentPath={setCurentPath} Dir={dictionary}/>
+            <CodeEditor data={codeText} onChange={(e) => setCodeText(e.currentTarget.value)} path={currentPath}/>
             {currentPath != "" && (<button onClick={updateFilde}>save</button>)} <br />
-            
-            {createFilelocation(dictionary, "", true)}
         </div>
     )
 }

@@ -1,4 +1,3 @@
-import json
 from django.http import HttpRequest, HttpResponseForbidden, JsonResponse, HttpResponse
 from .models import Project, Folder, File
 from .filemanger import createPathTree, getFile, createFolder, createFile
@@ -30,7 +29,7 @@ def createProject(request: HttpRequest):
     name = request.POST.get("name")
     folder = Folder.objects.create(FolederName=name)
     project = Project.objects.create(projectName=name, rootFolder=folder)
-    project.projectsin.add(request.user)
+    project.user.add(request.user)
     return createDoc(project)
     
 

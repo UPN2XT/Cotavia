@@ -1,18 +1,21 @@
 {% load static %}
 
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Cotavia</title>
-    <script type="module" crossorigin src="{% static 'cotavia/javascript/interface.js' %}"></script>
+    <script
+      type="module"
+      crossorigin
+      src="{% static 'cotavia/javascript/interface.js' %}"
+    ></script>
+    <link rel="stylesheet" href="{% static 'cotavia/css/interface.css' %}" />
   </head>
   <body>
-    <form id="token">
-      {% csrf_token %}
-    </form>
+    <form id="token">{% csrf_token %}</form>
     <div id="root"></div>
   </body>
 </html>

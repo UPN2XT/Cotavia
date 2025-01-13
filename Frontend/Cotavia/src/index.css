@@ -1,0 +1,20 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+::-webkit-scrollbar {
+  visibility: hidden;
+}
+
+::-webkit-scrollbar-track {
+  visibility: hidden;
+}
+::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 5px;
+  height: 1rem;
+  visibility: hidden;
+}
+::-webkit-scrollbar-thumb:hover {
+  visibility: visible;
+}

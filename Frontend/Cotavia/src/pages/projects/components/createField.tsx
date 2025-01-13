@@ -22,11 +22,19 @@ export default function(props: useProps) {
         fetch(applicationData.host+`projects/create/${target}`, {method:"POST", body: body})
         .then(() => props.updateCode())
     }
+
+    const BASECLASS = "border-2 border-black rounded-lg p-1 "
+
     return (
-        <>
-            <input value={nameVal} onChange={e => setnameVal(e.currentTarget.value)}/>
-            <button onClick={creFile}>create file</button>
-            <button onClick={creFolder}>Create Folder</button>
-        </>
+        <div className="flex flex-col gap-4 text-sm">
+            <input value={nameVal} className={BASECLASS}
+                onChange={e => setnameVal(e.currentTarget.value)}/>
+            <div className="flex gap-2">
+                <button onClick={creFile} className={BASECLASS+"w-fit"}>
+                    create file</button>
+                <button onClick={creFolder} className={BASECLASS+"w-fit"}>
+                    Create Folder</button>
+            </div>
+        </div>
     )
 }

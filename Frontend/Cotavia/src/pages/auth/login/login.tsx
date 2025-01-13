@@ -1,6 +1,7 @@
 import { useState, ChangeEvent, FormEvent } from "react"
 import ApplicationData from "../../../data";
 import useCrf from "../../../hooks/useCrf";
+import AuthInputField from "../../../components/AuthInputField";
 interface DATA {
     username: string;
     password: string;
@@ -29,12 +30,20 @@ export default function() {
     }
 
     return (
-        <form onSubmit={login}>
-            <input name="username" value={data.username} placeholder="Username" onChange={update}/> <br />
-            <input type="password" name="password" value={data.password} placeholder="password"onChange={update}/> <br />
-            <button >
-                login
-            </button>
-        </form>
+        <div className="flex h-full">
+            <div className="flex flex-col h-full flex-grow justify-center">
+                <h1 className="text-3xl self-start ml-2">Login</h1>
+                    <form onSubmit={login} className="p-4 ml-2">
+                            <AuthInputField name="username" value={data.username} placeholder="Username" onChange={update}/>
+                            <br />
+                            <AuthInputField type="password" name="password" value={data.password} placeholder="password"onChange={update}/>
+                            <br />
+                        <AuthInputField type="submit" value="sign in" disabled={false}/>
+                </form>
+            </div>
+            <div className="flex-grow">
+        
+            </div>
+        </div>
     )
 }
