@@ -14,9 +14,9 @@ function App() {
   return (
 
     <profileContext.Provider value={profile}>
-      <div className="p-0 m-0 h-screen w-screen flex flex-col">
+      <div className="p-0 m-0 h-screen w-screen flex flex-col bg-gradient-to-tr from-neutral-950 to-neutral-900 text-gray-100">
         <Nav />
-        <main className="p-4 flex-grow">
+        <main className="p-2 flex-grow">
           <Outlet />
         </main>
       </div>

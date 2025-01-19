@@ -18,3 +18,7 @@
 ::-webkit-scrollbar-thumb:hover {
   visibility: visible;
 }
+
+::-webkit-scrollbar-corner {
+    visibility: hidden;
+}
