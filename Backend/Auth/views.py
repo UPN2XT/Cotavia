@@ -38,14 +38,17 @@ def Login(request: HttpRequest):
         username = form.cleaned_data["username"]
         password = form.cleaned_data["password"]
         
-        user = authenticate(request, username=username, password=password)
+        try:
+            user = authenticate(request, username=username, password=password)
+        except:
+            user = None
 
         if user is not None:
             login(request, user=user)
             return HttpResponse()
         
         else:
-            return HttpResponseNotFound()
+            return HttpResponseNotFound("{error: 'username and password does not match'}")
         
     except:
             return HttpRequest("error")
@@ -57,6 +60,7 @@ def signup(request: HttpRequest):
 
     form = signupFrom(request.POST)
     if not form.is_valid():
+        print(form.errors)
         return HttpResponseBadRequest()
     
     username = form.cleaned_data["username"]
@@ -64,10 +68,12 @@ def signup(request: HttpRequest):
     email = form.cleaned_data["email"]
     displayname: str = form.cleaned_data["displayname"]
 
-    
-    user = User.objects.filter(username=username,).first()
+    try:
+        user = User.objects.get(username=username,)
+    except:
+        user = None
     if user is not None:
-        return HttpResponseNotAllowed()
+        return HttpResponseNotAllowed("{error: 'username is already in use'}")
 
     user = User.objects.create_user(username=username, password=password, email=email)
     profile = Profile.objects.create(displayName=displayname, user=user)
@@ -77,8 +83,6 @@ def signup(request: HttpRequest):
 
     return HttpResponse()
         
-    
-    
 
 def logoutit(request: HttpRequest):
     if not request.user.is_authenticated:

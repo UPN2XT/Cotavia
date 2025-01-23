@@ -32,20 +32,53 @@ class ProjectConsumer(WebsocketConsumer):
 
     def project_update(self, event):
         metaData = {
-            "event": event["event"],
-            "path": event["path"],
-            "name":  event["name"]
+            "event": event["event"]
         }
+
+        if event["event"] == "delete/User":
+            if event["username"] == self.user.username:
+                self.send(text_data=json.dumps(metaData))
+            return
+        
+        if event["event"] == "role/change/reload":
+            self.send(text_data=json.dumps(metaData))
+            return
+        
+        if event["event"] == "role/change":
+            if event["Type"] == "folder":
+                target = getFolder(event["path"], self.project.rootFolder, self.user)
+            else:
+                target = getFile(event["path"], self.project.rootFolder, self.user)
+            if target == None:
+                event["event"] = "delete"+"/"+event["Type"]
+                metaData["event"] = "delete"
+            else:
+                return
         if event["event"] == "create/folder":
             folder = getFolder(event["path"], self.project.rootFolder, self.user)
+            metaData["path"] = event["path"]
             if folder == None:
                 return
+            metaData["name"] =  event["name"]
             
         if event["event"] == "update/file":
             file = getFile(f'{event["path"]}/{event["name"]}', self.project.rootFolder, self.user)
+            metaData["path"] = event["path"]
             if file == None:
                 return
             metaData["data"] = event["data"]
+            metaData["name"] =  event["name"]
+
+        
+        if "copy" in event["event"] or "cut" in event["event"]:
+            metaData["from"] = event["from"]
+            metaData["to"] = event["to"]
+            metaData["name"] = event["name"]
+        
+        if "delete" in event["event"]:
+            metaData["path"] = event["path"]
+
         self.send(text_data=json.dumps(metaData))
+
         
         

@@ -27,7 +27,7 @@ def createFolderRequest(request: HttpRequest):
         "type": "project.update",
         "event": "create/folder",
         "path": path,
-        "name": name,
+        "name": folder.FolederName,
     })
     return SucessMessage
 
@@ -52,7 +52,7 @@ def createFileRequest(request: HttpRequest):
         "event": "update/file",
         "path": path,
         "data": data,
-        "name": name
+        "name": f.FileName
     })
     return SucessMessage
     

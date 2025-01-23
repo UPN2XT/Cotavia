@@ -4,5 +4,6 @@ from . import views
 urlpatterns = [
     path("profiles/self", views.getUserProfile, name="getMyProfile"),
     path("profiles/reqs", views.getRequest, name="getRequests"),
-    path("profiles/req/handle", views.handleConnectionRequest, name="handleReqs")
+    path("profiles/req/handle", views.handleConnectionRequest, name="handleReqs"),
+    path("profiles/search", views.search, name="user search")
 ]

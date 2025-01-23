@@ -8,6 +8,7 @@ class Profile(models.Model):
     pfp = models.ImageField(upload_to="images/users/pfp")
     displayName = models.CharField(max_length=32)
     connections = models.ManyToManyField("self", blank=True)
-    outgoingrequest = models.ManyToManyField("self", blank=True)
-    incomingrequests = models.ManyToManyField("self", blank=True)
+class ConnectionRequest(models.Model):
+    From = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name="outgoingrequest")
+    To = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name="incomingrequests")
 

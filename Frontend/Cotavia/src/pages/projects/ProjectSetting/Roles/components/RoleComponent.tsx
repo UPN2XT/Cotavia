@@ -3,7 +3,7 @@ import { ChevronDownIcon, ChevronUpIcon } from "@heroicons/react/16/solid"
 import RoleModificationField from "./RoleModificationField";
 import data from "../../../../../data";
 import useCrf from "../../../../../hooks/useCrf";
-
+import UserRoles from "./UserRoles";
 export interface Role {
     isAdmin: boolean;
     canCreate: boolean;
@@ -23,6 +23,7 @@ export default function({role, id}: useProps) {
     const [show, setShow] = useState<boolean>(false)
     const [roleState, setRoleState] = useState<Role>(role)
     const [disabled, setDisabled] = useState<boolean>(false)
+    const [showUsers, setShowUsers] = useState<boolean>(false)
 
     const updateRole = () => fetch(data.host+"projects/settings/roles/updateRole", {
         method: "POST",
@@ -39,6 +40,9 @@ export default function({role, id}: useProps) {
 
     return (
         <div className="bg-neutral-900 rounded-2xl p-4 w-full">
+            <div className={showUsers? "visible": "hidden"}>
+                <UserRoles setFunction={setShowUsers} roleName={role.name} id={String(id)}/>
+            </div>
             <div className="flex items-center justify-between">
                 <div className="text-2xl font-semibold">
                     {roleState.name}
@@ -67,7 +71,8 @@ export default function({role, id}: useProps) {
                         </button>
                     </div>
                     <div>
-                        <button className="text-xl font-medium">
+                        <button className="text-xl font-medium"
+                            onClick={() => setShowUsers(true)}>
                             users
                         </button>
                     </div>

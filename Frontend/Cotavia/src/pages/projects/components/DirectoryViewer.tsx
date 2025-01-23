@@ -1,5 +1,6 @@
 import PathNone from "./pathNode"
 import FolderNode from "./folderNode"
+
 export interface Folder 
 {
     name: string,
@@ -18,12 +19,10 @@ export interface SubFiles
 }
 
 interface useProps {
-    id: string | undefined;
-    setCodeText: Function;
-    setCurentPath: Function;
-    Dir: Folder
+    Dir: Folder,
 }
-export default function({id, setCodeText, setCurentPath, Dir}: useProps) {
+export default function({Dir}: useProps) {
+
     const createFilelocation = (root: Folder, path: string, isRoot: boolean) => {
             const subFolders = []
             const rootRef = isRoot? '': path+`${root.name}/`
@@ -33,17 +32,21 @@ export default function({id, setCodeText, setCurentPath, Dir}: useProps) {
             const subFiles = []
             if (root.files != null)
                 for (const key in root.files)
-                    subFiles.push((<PathNone name={key} path={rootRef+key} folder={false} data={root.files[key]} updateFunctionText={setCodeText} updateFunctionPath={setCurentPath} />))
+                    subFiles.push((<PathNone name={key} path={rootRef+key} folder={false} data={root.files[key]} 
+                            rootRef=""/>))
             
             
             return (
-                <FolderNode id={id} root={root} rootRef={rootRef}
-                    path={path} subFolders={subFolders} subFiles={subFiles}
-                    setCodeText={setCodeText} setCurentPath={setCurentPath}/>
+                <FolderNode root={root} rootRef={rootRef}
+                    path={path} subFolders={subFolders} subFiles={subFiles} isRoot={isRoot}
+                    />
             )
         }
     return (
-        <div className=" h-full w-max max-h-[80vh] p-2 scroll-smooth overflow-x-scroll scroll overflow-y-scroll border-r-neutral-900 border-r-2">
+        <div className=" h-full w-max bg-neutral-800 rounded-md shadow-sm shadow-neutral-950 p-4 min-w-60 overflow-x-scroll scroll overflow-y-scroll">
+            <div className="mb-2 text-xl font-semibold border-b-2 border-purple-400 pb-1">
+                Explorer
+            </div>
             {createFilelocation(Dir, "", true)}
         </div>
     )

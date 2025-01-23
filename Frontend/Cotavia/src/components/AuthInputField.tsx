@@ -5,6 +5,6 @@ interface useProps
 
 export default function(props: useProps) {
     return (
-        <input className="border-2 border-black rounded-xl p-2 font-normal mb-4 text-md shadow" {...props}/>
+        <input className="rounded-xl p-3 font-normal mb-4 text-md bg-neutral-950 backdrop-blur-xl bg-opacity-30 w-4/5" {...props}/>
     )
 }

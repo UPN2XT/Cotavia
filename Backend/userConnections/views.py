@@ -1,6 +1,7 @@
-from .models import Profile, User
+from .models import Profile, User, ConnectionRequest
 from django.http import HttpRequest, HttpResponseForbidden, JsonResponse, HttpResponse, HttpResponseBadRequest
-
+from projects.views.utils.basicCheck import requestCheck, SucessMessage, basicCheck
+from .forms import handleConnectionRequestFrom
 
 def createProfileData(profile: Profile):
     return {
@@ -22,7 +23,9 @@ def getUserProfile(request: HttpRequest):
     if request.method != 'POST':
         return HttpResponseForbidden()
     if not request.user.is_authenticated:
-        return HttpResponseForbidden()
+        res: HttpResponse = HttpResponse()
+        res.status_code = 401
+        return res
     return JsonResponse(createProfileData(request.user.userprofile.all().first()))
 
 def updateProfile(request: HttpRequest):
@@ -30,7 +33,7 @@ def updateProfile(request: HttpRequest):
         return HttpResponseForbidden()
     if not request.user.is_authenticated:
         return HttpResponseForbidden()
-    profile: Profile = request.user.userprofile.all().first()
+    profile: Profile = request.user.userprofile.get()
     displayName = request.POST.get("displayname")
     pfp = request.FILES['pfp']
     if profile:
@@ -45,41 +48,50 @@ def sendConnectionRequest(request: HttpRequest):
     if not request.user.is_authenticated:
         return HttpResponseForbidden()
     username = request.POST.get('username')
-    user = User.objects.filter(username=username).first()
+    try:
+        user = User.objects.get(username=username)
+    except:
+        return HttpResponseBadRequest("{error: 'user could not be found'}")
     request.user.userprofile.outgoingrequest.add(user)
-    request.user.save()
+    user.userprofile.get().incomingrequests.add(user)
     return HttpResponse()
 
-def handleConnectionRequest(request: HttpRequest):
-    if request.method != 'POST':
-        return HttpResponseForbidden()
-    if not request.user.is_authenticated:
-        return HttpResponseForbidden()
-    username = request.POST.get('username')
-    accept = request.POST.get('accept')
-    mode = request.POST.get('mode')
-    if mode == "i":
-        ps = request.user.userprofile.get().incomingrequests.all()
-    elif mode=="o":
-        ps = request.user.userprofile.get().outgoingrequest.all()
-    else:
-        ps = request.user.userprofile.get().connections.all()
-    target = None
-    for p in ps:
-        if p.user.username == username:
-            target = p
-            break
+def getTargetProfile(request, mode, username, userProfile):
+    try:
+        if mode == "i":
+            return ConnectionRequest.objects.get(To=userProfile, From__user__username=username)
+        elif mode=="o":
+            return ConnectionRequest.objects.get(From=userProfile, To__user__username=username)
+        elif mode=="c":
+            return request.user.userprofile.get().connections.get(user__username=username)
+        else:
+            return User.objects.filter(username=username).first().userprofile.get()
+    except:
+        return None
+
+def handleRelation(request, mode, username, accept):
+    userProfile: Profile = request.user.userprofile.get()
+    target: Profile = getTargetProfile(request, mode, username, userProfile)
     if target == None:
-        return HttpResponseBadRequest()
-    if accept == 'T' and mode == "i":
-        request.user.userprofile.get().connections.add(target)
-    if mode == "i":
-        request.user.userprofile.get().incomingrequests.remove(target)
-    elif mode == 'o':
-        request.user.userprofile.get().outgoingrequest.remove(target)
+        return HttpResponseBadRequest("{error: 'target not found'}")
+    if mode == "i" or mode=="o":
+        if accept == 'T' and mode == "i":
+            userProfile.connections.add(target.From)
+        target.delete()
+    elif mode == 'c':
+        userProfile.connections.remove(target)
     else:
-        request.user.userprofile.get().connections.remove(target)
-    return HttpResponse()
+        ConnectionRequest.objects.create(To=target, From=userProfile)
+
+def handleConnectionRequest(request: HttpRequest):
+    analysis = requestCheck(request, handleConnectionRequestFrom, ["accept", "mode", "username"])
+    if analysis["error"]:
+        return analysis["errorResponse"]
+    mode: str = analysis["mode"]
+    username: str = analysis["username"]
+    accept: str = analysis["accept"]
+    handleRelation(request, mode, username, accept)
+    return SucessMessage
 
 def getRequest(request: HttpRequest):
     if request.method != 'POST':
@@ -88,10 +100,13 @@ def getRequest(request: HttpRequest):
         return HttpResponseForbidden()
     reqsList = {}
     mode = request.POST.get("mode")
+    if mode == None:
+        return HttpResponseBadRequest('{error: "invalid request"}')
+    my_profile = Profile.objects.get(user=request.user)
     if mode == 'i':
-        reqs = request.user.userprofile.get().incomingrequests.all()
+        reqs = Profile.objects.filter(outgoingrequest__To=my_profile)
     elif mode == 'o':
-        reqs = request.user.userprofile.get().outgoingrequest.all()
+        reqs = Profile.objects.filter(incomingrequests__From=my_profile)
     else:
         reqs = request.user.userprofile.get().connections.all()
     for r in reqs:
@@ -100,26 +115,28 @@ def getRequest(request: HttpRequest):
     return JsonResponse(reqsList)
 
 def search(request: HttpRequest):
-    find = request.POST.get('find')
+    if not basicCheck(request, "POST"):
+        return HttpResponseForbidden('{error: "un autherized access"}')
+    find = request.POST.get('query')
+    if find == None:
+        return HttpResponseBadRequest('{error: "invalid request"}')
     Users = User.objects.filter(
         username__contains=find).exclude(username=request.user.username)
     data = {}
-    my_profile = request.user.userprofile.all().first()
+    my_profile = request.user.userprofile.get()
     for user in Users:
-        profile = user.userprofile.all().first()
+        profile: Profile = user.userprofile.get()
         # check the relation between the searched profiles and request user profile
-        if my_profile in profile.connections.all():
-            mode = "Remove Connection"
-        elif my_profile in profile.outgoingrequest.all():
-            mode = "Accept Connection"
-        elif my_profile in profile.incomingrequests.all():
-            mode = "Cancel Connection"
-        else:
-            mode = "Connect"
+        if my_profile.connections.filter(user=user).exists():
+            continue
+        elif profile.outgoingrequest.filter(From__user=user).exists():
+            continue
+        elif profile.incomingrequests.filter(To__user=user).exists():
+            continue
+
         pfdata = {
-            "DisplayName": profile.DisplayName,
-            "pfp": str(profile.pfp),
-            "mode": mode
+            "displayname": profile.displayName,
+            "pfp": str(profile.pfp.url),
         }
         data[user.username] = pfdata
     return JsonResponse(data)

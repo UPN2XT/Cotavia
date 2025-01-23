@@ -1,7 +1,7 @@
 from django.http import HttpRequest
 from django.forms import forms
 from django.http import HttpResponseBadRequest, HttpResponseForbidden, HttpResponse
-from projects.models import Project
+from projects.models import Project, Role
 import json
 
 PROJECTNOTFOUNDERROR = HttpResponseBadRequest(json.dumps(
@@ -35,5 +35,11 @@ def requestCheck(request: HttpRequest, Form: forms.Form, values: list[str]):
     return analsis
 
 def getProject(id, request: HttpRequest): 
-    project: Project = request.user.projectsin.filter(id = id).first()
+    try:
+        project: Project = request.user.projectsin.filter(id = id).first()
+    except:
+        project = None
     return project
+
+def modificationAllowed(request, project):
+    return Role.objects.filter(project=project, users=request.user, isAdmin=True).exists()

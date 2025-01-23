@@ -9,7 +9,7 @@ export default async function(setFunction: Function, mode: string) {
     const result = await response.json()
     const cards = []
     for (const key in result) {
-        cards.push((<RequestCard username={key} displayname={result[key].Displayname} pfp={result[key].pfp}
+        cards.push((<RequestCard updatable={false} username={key} displayname={result[key].Displayname} pfp={result[key].pfp}
                 setFunction={setFunction} mode={mode}/>))
     }
     return cards

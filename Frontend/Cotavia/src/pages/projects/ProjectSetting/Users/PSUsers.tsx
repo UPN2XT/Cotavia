@@ -44,7 +44,7 @@ export default function() {
     }, [])
 
     const userCards = usersIn.map(us => (
-        <UserCard user={us} removeFunction={() => removeUser(us.username, setUsersIn)} id={String(id)}/>
+        <UserCard user={us} removeFunction={() => removeUser(us.username, setUsersIn)} id={String(id)} />
     ))
 
     const connectionOptions = usersFromConnections.map((us, i) => (

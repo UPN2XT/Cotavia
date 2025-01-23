@@ -1,6 +1,7 @@
 import data from "../../../../../data";
 import useCrf from "../../../../../hooks/useCrf";
 import { useState } from "react";
+import UserCardTemp from "../../components/UserCardTemp";
 
 export interface user{
     username: string;
@@ -11,7 +12,7 @@ export interface user{
 interface useProps {
     user: user;
     removeFunction: Function;
-    id: string
+    id: string;
 }
 
 export default function(props: useProps) {
@@ -27,29 +28,17 @@ export default function(props: useProps) {
             method: "POST",
             body: body
         })
-        .then(() => {
+        .then(res => {
+            if (res.status != 200) {
+                setDisabled(false)
+                return
+            }
             props.removeFunction()
         })
-        .catch(() => setDisabled(false))
     }
 
-    return (
-        <div className="w-4/6 bg-neutral-800 rounded-lg flex justify-between p-2 items-center">
-            <div className="flex items-center gap-4">
-                <img src={props.user.pfp} className="w-16 rounded-full"/>
-                <div className="flex flex-col">
-                    <text className="font-bold text-xl">
-                        {props.user.displayname}
-                    </text>
-                    <text className="text-lg">
-                        @{props.user.username}
-                    </text>
-                </div>
-            </div>
-            <button className="bg-red-500 pl-3 pr-3 pt-1 pb-1 rounded-xl h-12"
-                onClick={removeUser} disabled={disabled}>
-                Remove
-            </button>
-        </div>
-    )
+    return  (
+        <UserCardTemp user={props.user} func={removeUser} disabled={disabled} remove={true}/>
+    ) 
+            
 }

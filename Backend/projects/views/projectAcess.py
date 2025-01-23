@@ -7,7 +7,7 @@ from ..forms.projectAcessForms import createProjectForm, IdAcessForm
 def createDoc(project: Project, user):
     return JsonResponse({
         'id': project.id,
-        'filePath': createPathTree(project.rootFolder, user)
+        'filePath': createPathTree(project.rootFolder, user),
     })
 
 def getProjects(request: HttpRequest):
@@ -27,7 +27,7 @@ def createProject(request: HttpRequest):
     folder = Folder.objects.create(FolederName=name) # root folder
     project = Project.objects.create(projectName=name, rootFolder=folder)
     project.user.add(request.user)
-    role1 = Role.objects.create(project=project, isAdmin=True) # admin role
+    role1 = Role.objects.create(project=project, isAdmin=True, roleName="creator") # admin role
     role2 = Role.objects.create(project=project, isAdmin=False, roleName="default") # default role
     project.defaultrole = role2
     project.creatorole = role1
@@ -44,3 +44,20 @@ def getProjectData(request: HttpRequest):
     if project == None:
         return PROJECTNOTFOUNDERROR
     return createDoc(project, request.user)
+
+def getPermisionInfo(request: HttpRequest):
+    analysis = requestCheck(request, IdAcessForm, ["ID"])
+    if analysis["error"]:
+        return analysis["errorResponse"]
+    id = analysis["ID"]
+    project = getProject(id, request)
+    if project == None:
+        return PROJECTNOTFOUNDERROR
+    user = request.user
+    admin : bool = project.projectroles.filter(isAdmin=True, users=user).exists()
+    return JsonResponse({
+        'isAdmin': admin,
+        'canCreate': admin or project.projectroles.filter(canCreate=True, users=user).exists(),
+        'canDelete': admin or project.projectroles.filter(canDelete=True, users=user).exists(),
+        'canModifyFiles': admin or project.projectroles.filter(canModifyFiles=True, users=user).exists()
+    })

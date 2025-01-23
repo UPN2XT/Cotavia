@@ -5,6 +5,20 @@ from ...forms.projectAcessForms import IdAcessForm
 from ...forms.ProjectSettings.userSettingsForms import UpdateUsersForm
 from userConnections.models import Profile, User
 
+
+from channels.layers import get_channel_layer
+from asgiref.sync import async_to_sync
+
+channel_layer = get_channel_layer()
+groupSend = async_to_sync(channel_layer.group_send)
+
+def deleteEvent(id, username):
+    groupSend(f"project_{id}", {
+        "type": "project.update",
+        "event": "delete/User",
+        "username": username
+    })
+
 def createUserList(users):
     data = {}
     for user in users:
@@ -13,7 +27,7 @@ def createUserList(users):
             "displayname": profile.displayName,
             "pfp": profile.pfp.url
         }
-    return JsonResponse(data)
+    return data
 
 def basicAnalsis(request: HttpRequest):
     analysis = requestCheck(request, IdAcessForm, ["ID"])
@@ -31,7 +45,7 @@ def getUsers(request: HttpRequest):
         return o2
     project: Project = o2
     users = project.user.exclude(username=request.user.username)
-    return createUserList(users)
+    return JsonResponse(createUserList(users))
     
 def getConnectionsOutside(request:HttpRequest):
     (ok, o2) = basicAnalsis(request)
@@ -41,7 +55,7 @@ def getConnectionsOutside(request:HttpRequest):
     userProfile: Profile = request.user.userprofile.get()
     connectedUsers = User.objects.filter(userprofile__connections=userProfile)
     usersNotInProject = connectedUsers.exclude(id__in=project.user.all())
-    return createUserList(usersNotInProject)
+    return JsonResponse(createUserList(usersNotInProject))
 
 def basicAnalsis2(request: HttpRequest):
     analysis = requestCheck(request, UpdateUsersForm, ["username", "ID"])
@@ -59,7 +73,10 @@ def AddUser(request: HttpRequest):
     (ok, username, project) = basicAnalsis2(request)
     if not ok:
         return project
-    user: User = request.user.userprofile.get().connections.filter(user__username=username).first().user
+    try:
+        user: User = request.user.userprofile.get().connections.get(user__username=username).user
+    except:
+        return HttpResponseBadRequest("{error: 'user not found'}")
     if project.user.filter(username=user.username).exists():
         return HttpResponseForbidden("{error: 'User is already added'}")
     project.user.add(user)
@@ -70,13 +87,17 @@ def removeUser(request: HttpRequest):
     (ok, username, project) = basicAnalsis2(request)
     if not ok:
         return project
-    user = project.user.filter(username=username).first()
+    try:
+        user = project.user.get(username=username)
+    except:
+        return HttpResponseBadRequest("{error: 'user not found'}")
     if user == None:
         return HttpResponseBadRequest()
     project.user.remove(user)
     roles = project.projectroles.filter(users=user)
     for role in roles:
         role.users.remove(user)
+    deleteEvent(project.id, user.username)
     return SucessMessage
 
 

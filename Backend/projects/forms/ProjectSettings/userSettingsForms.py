@@ -12,3 +12,18 @@ class RoleUpdate(forms.Form):
     ID = Form.CharField(required=True)
     action = Form.CharField(required=True)
     data = Form.JSONField(required=True)
+
+class GetUsersRoleInfo(forms.Form):
+    ID = Form.CharField(required=True)
+    name = Form.CharField(required=True)
+
+class UpdateUserInRoleForm(GetUsersRoleInfo):
+    username = Form.CharField(required=True)
+    action = Form.CharField(required=True)
+
+class DirRoleForm(forms.Form):
+    ID = Form.CharField(required=True)
+    name: str = Form.CharField(required=False)
+    path: str = Form.CharField(required=True)
+    type: str = Form.CharField(required=True)
+    action: str = Form.CharField(required=False)

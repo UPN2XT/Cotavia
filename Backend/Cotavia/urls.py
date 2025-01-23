@@ -24,8 +24,8 @@ urlpatterns = [
     path("auth/", include("Auth.urls")),
     path("projects/", include("projects.urls")),
     path("", include("userConnections.urls"), name='connections'),
-    path("frontend", include("Coda.urls"), name='frontend')
+    path("", include("Coda.urls"), name='frontend')
 ]
 
 if settings.DEBUG:
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    urlpatterns = static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) + urlpatterns

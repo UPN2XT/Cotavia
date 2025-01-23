@@ -3,6 +3,7 @@ import useCrf from "../../../hooks/useCrf";
 import data from "../../../data";
 import { useState } from "react";
 import getIncomingRequests from "../scripts/ConnectionsListHandler";
+import { XMarkIcon } from "@heroicons/react/16/solid";
 
 interface userProps {
     username:string;
@@ -10,6 +11,7 @@ interface userProps {
     pfp: string;
     setFunction: Function;
     mode: string;
+    updatable: boolean
 }
 
 export default function(props: userProps) {
@@ -23,30 +25,46 @@ export default function(props: userProps) {
         body.append("accept", accept? "T": "F")
         body.append("mode", props.mode)
         fetch(data.host+"profiles/req/handle", {method: 'POST', body:body})
-        .then(() => getIncomingRequests(props.setFunction, props.mode))
-        .then(c => props.setFunction(c))
+        .then(() => {
+            if (!props.updatable)
+                getIncomingRequests(props.setFunction, props.mode)
+                .then(c => props.setFunction(c))
+            else {
+                props.setFunction()
+            }
+        })
+        
     }
         
 
     return (
-        <BorderRoundedCard classes="w-40 flex flex-col items-center p-2">
-            <img src={props.pfp} className="h-16 rounded-full"/>
-                <text className="text-center font-bold text-xl">
-                    {props.displayname}
-                </text>
-            <text className="text-center">
-                {props.username}    
-            </text>
-            <div className="flex gap-2">
-                <button className="border-2 p-2 border-black rounded-md" disabled={!isActive} onClick={()=>accept(true)}>
-                    {props.mode == "i"? "Connect": props.mode == "o"? "Cancel": "Remove"}
-                </button>
-                {
-                    props.mode == 'i' && <button className="border-2 p-2 border-black rounded-md" disabled={!isActive} onClick={()=>accept(false)}>
-                        X
+        <BorderRoundedCard classes="min-w-72 flex items-center p-6 gap-2 w-fit">
+            <img src={props.pfp} className="size-24 rounded-full"/>
+                
+            <div className="flex flex-col gap-2 w-48 overflow-clip">
+                <div className="flex text-xl flex-col items-end pr-2">
+                    <h3 className="text-center font-bold text-4xl text-clip">
+                        {props.displayname}
+                    </h3>
+                    <h3 className="text-center text-pretty self-end">
+                        @{props.username}    
+                    </h3>
+                </div>
+                {props.mode != "x" && (
+                <div className="flex gap-2 justify-end">
+                    <button className={"p-2 rounded-md " + (props.mode == "c" || props.mode == "o"? "bg-red-500": "bg-green-500")} disabled={!isActive} onClick={()=>accept(true)}>
+                        {props.mode == "c"? "Remove": props.mode == "o" ? "Cancel": props.mode == "s"? "Send": "Add"}
                     </button>
-                }
+                    {
+                        props.mode == 'i' && <button className="bg-red-500 p-2 rounded-md" disabled={!isActive} onClick={()=>accept(false)}>
+                            <XMarkIcon className="size-5"/>
+                        </button>
+                    }
+                </div>
+                )}
+                
             </div>
+            
         </BorderRoundedCard>
     )
 }

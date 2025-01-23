@@ -1,12 +1,19 @@
 import Editor, { OnChange } from '@monaco-editor/react';
-import { PaperClipIcon } from '@heroicons/react/16/solid';
-import { MouseEventHandler } from 'react';
+import Tab from './Tab';
+import { useEffect } from 'react';
+import { Folder } from './DirectoryViewer';
+
 interface useProps
 {
     data: string
     onChange: OnChange
     path: string
-    updateFile: MouseEventHandler
+    upToDateData: string
+    setFunction: Function
+    setFunction2: Function
+    Tabs: string[]
+    setTabs: Function
+    root: Folder
 }
 
 export default function(parms: useProps) {
@@ -50,24 +57,59 @@ export default function(parms: useProps) {
         return extensionLanguageMap[fileExtension] || "plaintext";
     }
     
+    useEffect(() => {
+        if (parms.path != "" && parms.Tabs.find(s => s == parms.path) == undefined)
+        {
+            console.log("test")
+            parms.setTabs((t: string[]) => [...t, parms.path])
+        }
+            
+    }, [parms.path])
+
+    const tabs = parms.Tabs.map(s => <Tab path={s} root={parms.root} setTabs={parms.setTabs} tabs={parms.Tabs}/>)
 
     return (
-        <div className="flex-grow flex flex-col max-h-fit">
-            <div className='h-[7%] rounded-lg flex justify-between items-center pl-2'>
-                <text className="text-md">{parms.path}</text>
-                {parms.path != "" && 
-                (<button onClick={parms.updateFile}>
-                    <PaperClipIcon className='size-6 mr-4'/>
-                </button>)}
-            </div>
+        <div className="flex-grow max-h-screen">
             
-            <Editor className="flex-grow" 
-                defaultValue="// some comment" 
-                theme="vs-dark"
-                language={getLanguageFromPath(parms.path)}
-                value={parms.data}
-                onChange={parms.onChange}
-            />
+            <div className={"flex flex-col h-screen " + (parms.path? "visible": "hidden")}>
+                <div className='h-[8%] rounded-lg flex justify-between items-center pl-2 pt-2'>
+                    <div className='flex w-[90%] gap-1 overflow-scroll h-full'>
+                        {...tabs}
+                    </div>
+                    {parms.path != "" && 
+                    (
+                    <>
+                        <div className={'size-4 mr-2 rounded-full ' + ((parms.upToDateData != "") ? 'bg-yellow-300': 'bg-green-500')}
+                            onClick={() => {
+                                if (parms.upToDateData == "") 
+                                    return
+                                parms.setFunction(parms.upToDateData)
+                                parms.setFunction2("")
+                            }}>
+
+                        </div>
+                    </>
+                )}
+                </div>
+                <div className='flex items-center pl-2 h-[3%] p-1 bg-neutral-900 bg-opacity-30 backdrop-blur-xl'>
+                    <text className="text-sm">{parms.path.replace("/", " > ")}</text>
+                </div>
+                <div className='max-h-[90%] h-[88%]'>
+                    <Editor className="" 
+                        defaultValue="" 
+                        theme="vs-dark"
+                        language={getLanguageFromPath(parms.path)}
+                        value={parms.data}
+                        onChange={parms.onChange} />
+                </div>
+                
+                </div>
+                <div className={'h-screen flex flex-grow justify-center items-center ' + (!parms.path? "visible": "hidden")}>
+                        <div className='opacity-20 text-9xl hover:cursor-default font-medium'>
+                            Codavia
+                        </div>
+                </div>
+            
         </div>
     )
 }

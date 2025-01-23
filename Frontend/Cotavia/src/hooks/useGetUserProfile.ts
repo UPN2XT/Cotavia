@@ -1,8 +1,18 @@
 import data from "../data"
 import useCrf from "./useCrf"
 
-export default function(setProfile: Function) {
-    fetch(data.host+"profiles/self", {method:"POST", body:useCrf()})
-      .then(res => res.json())
-      .then(result => setProfile(result))
+function delay(ms: number) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+export default async function(setProfile: Function) {
+    const res = await fetch(data.host+"profiles/self", {method:"POST", body:useCrf()})
+    await delay(500)
+    if (res.status == 401)
+    {
+      return false
+    }  
+    const result = await res.json()
+    setProfile(result)
+    return true
 }
