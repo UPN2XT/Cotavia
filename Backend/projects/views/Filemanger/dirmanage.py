@@ -1,10 +1,11 @@
-from django.http import HttpRequest
+from django.http import HttpRequest, FileResponse
 from ..utils.basicCheck import requestCheck, getProject, PROJECTNOTFOUNDERROR, ROLEDENIEDERROR, SucessMessage
-from ...forms.FilemangerForms import DirRequestForm
-from ..utils.filemanger import createFolder, createFile, getFile
+from ...forms.FilemangerForms import DirRequestForm, FileCreationForm, FileGetterForm, FileCreationForm, FileUpdateForm
+from ..utils.filemanger import createFolder, createFile, getFile, openFile, FileUpdater
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
 from ...models import Project, File
+import json
 
 channel_layer = get_channel_layer()
 groupSend = async_to_sync(channel_layer.group_send) # Channel sending method rappers
@@ -32,39 +33,43 @@ def createFolderRequest(request: HttpRequest):
     return SucessMessage
 
 def createFileRequest(request: HttpRequest):
-    analysis = requestCheck(request, DirRequestForm, ["path", "ID", "name", "data"])
+    analysis = requestCheck(request, FileCreationForm, ["path", "ID", "name", "data", "Type"])
     if analysis["error"]:
         return analysis["errorResponse"]
     path = analysis["path"]
     id = analysis["ID"]
     name = analysis["name"]
     data = analysis["data"]
+    Type = analysis["Type"]
 
     project: Project = getProject(id, request)
     if project == None:
         return PROJECTNOTFOUNDERROR
     
-    f = createFile(path, project.rootFolder, name, data, request.user)
+    f = createFile(path, project.rootFolder, name, data, request.user, Type, id)
     if f == None:
         return ROLEDENIEDERROR
     groupSend(f"project_{id}", {
         "type": "project.update",
         "event": "update/file",
         "path": path,
-        "data": data,
+        "data": json.dumps({
+            "version": f.version,
+            "type": f.filetype
+        }),
         "name": f.FileName
     })
     return SucessMessage
     
 
 def updateFile(request: HttpRequest):
-    analysis = requestCheck(request, DirRequestForm, ["path", "ID", "data"])
+    analysis = requestCheck(request, FileUpdateForm, ["path", "ID", "data", "Type"])
     if analysis["error"]:
         return analysis["errorResponse"]
     path = analysis["path"]
     id = analysis["ID"]
     data = analysis["data"]
-
+    Type = analysis["Type"]
     project: Project = getProject(id, request)
     if project == None:
         return PROJECTNOTFOUNDERROR
@@ -73,14 +78,37 @@ def updateFile(request: HttpRequest):
     file: File = getFile(path, project.rootFolder, request.user)
     if file == None:
         return ROLEDENIEDERROR
-    file.data = data
+    file.version += 1
+    FileUpdater(file, data)
+    file.filetype = Type
     file.save()
     *path, name = path.split('/')
     groupSend(f"project_{id}", {
         "type": "project.update",
         "event": "update/file",
         "path": "/".join(path),
-        "data": data,
+        "data": {
+            "version": file.version,
+            "type": Type
+        },
         "name": name
     })
     return SucessMessage
+
+def getFileRequest(request):
+    analysis = requestCheck(request, FileGetterForm, ["path", "ID"])
+    if analysis["error"]:
+        return analysis["errorResponse"]
+    path = analysis["path"]
+    id = analysis["ID"]
+
+    project: Project = getProject(id, request)
+    if project == None:
+        return PROJECTNOTFOUNDERROR
+    
+    file = openFile(path, project.rootFolder, request)
+    if file == None:
+        return ROLEDENIEDERROR
+    
+    return FileResponse(file)
+    

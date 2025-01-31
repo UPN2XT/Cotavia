@@ -1,17 +1,23 @@
-import { useState, useEffect, KeyboardEvent, useRef, useContext } from "react"
+import { useState, useEffect, useContext } from "react"
 import { useNavigate, useParams } from "react-router"
 import useCrf from "../../hooks/useCrf"
 import applicationData from "../../data"
 import CodeEditor from "./components/codeEditor"
-import DirectoryViewer from "./components/DirectoryViewer"
+import DirectoryViewer, { FileContainer } from "./components/DirectoryViewer"
 import { Folder } from "./components/DirectoryViewer"
-import socketHandler from "./scripts/socketHandler"
+import SocketHandler from "./scripts/SocketEvents/socketHandler"
 import SideBar from "./components/SideBar"
-import ContextMenu from "./components/contextMenu"
-import { contextInfo } from "./components/contextMenu" 
-import { projectContext, TransferInfo, InfoMenu } from "../../context/projectContext"
+import ContextMenu, { contextInfo } from "./components/contextMenu"
+import { projectContext, project, codeTextInterface } from "../../context/projectContext"
 import RoleModifier from "./components/roleModifier"
 import { permisionContext, permisions } from "../../context/permisionsContext"
+import LinkManagePannel from "../Link/components/LinkManagePannel"
+import { LinkContext, LinkData } from "../../context/LinkContext"
+import pathChange from "./scripts/projectManger/pathChange"
+import saveFile from "./scripts/projectManger/saveFile"
+import getFileFromServer from "../Link/scripts/getFile"
+import updateTextCode from "./scripts/projectManger/updateTextCode"
+import { getFile } from "./scripts/Updater"
 
 export default function() {
 
@@ -22,30 +28,21 @@ export default function() {
             files: {}
         } 
     )
-    const ref = useRef<HTMLDivElement | null>(null)
+    const {currentPath, ref, setContextInfo, codeText, setCodeText, 
+        contextInfo, MenuInfo, setMenuInfo } = useContext<project>(projectContext)
     const {id} = useParams()
-    const [codeText, setCodeText] = useState<string>("")
-    const [currentPath, setCurentPath] = useState<string>("")
-    const [menuInfo, setMenuInfo] = useState<contextInfo>({
-        x: 0, y: 0, toggle: false, children: <></>
-    })
-    const [upToDateData, setUpToDateData] = useState<string>("")
-    const [showExplorer, setShowExplorer] = useState<boolean>(true)
-    const [RoleMenu, setRoleMenu] = useState<InfoMenu>({
-        path: "",
-        toggle: false,
-        type: ""
-    })
-
-    const [transferInfo, setTransferInfo] = useState<TransferInfo>({   from: "",
-            to: "",
-            type: "",
-            copy: false
-        })
+    const [upToDateData, setUpToDateData] = useState<boolean>(true)
+    const [sideTabIndex, setSideTabIndex] = useState<number>(-1)
 
     const [tabs, setTabs] = useState<string[]>([])
     const {canModifyFiles,setFunction} = useContext<permisions>(permisionContext)
     const [allowSave, setAllowSave] = useState<boolean>(true)
+    const [chache, setChache] = useState<{[path: string]: {
+        data: string,
+        file: FileContainer
+    }}>({})
+    const {socket, setLinkDirectory, LiveUpdate, LinkDirectory} = useContext<LinkData>(LinkContext)
+    const [enableSocket, setEnableSocket] = useState<boolean>(false)
 
     const nav = useNavigate()
 
@@ -59,88 +56,84 @@ export default function() {
         } 
         const result = await res.json()
         setDictionary(result.filePath)
-        socketHandler(setDictionary, currentPath, setUpToDateData, String(id), codeText, setTabs,
-            RoleMenu, setRoleMenu, setFunction != undefined? setFunction:() => {}, nav)
+        setEnableSocket(true)
     }
 
-    const updateFile = async () => {
-        const body = useCrf()
-        body.append('ID', String(id))
-        body.append('path', currentPath)
-        body.append('data', codeText)
-        fetch(applicationData.host+"projects/updateFile", {method: 'POST', body: body})
-        .then(res => console.log(res.status))
-    }
+    const UpdateFunction = async (file: FileContainer | null = getFile(dictionary, currentPath)) => {
+        if (file == null) return
+        let result = await getFileFromServer(currentPath, String(id))
 
+        updateTextCode(setCodeText, currentPath, socket, String(id), setChache, file, result, true)
+    }
 
     useEffect(() => {
-        updateCode()
+        try {
+            updateCode()
+        }
+        catch {
+            if (applicationData.devaloperMode)
+                setDictionary({
+                    name: "root", 
+                    files: {},
+                    folders: {}
+                })
+        }
         document.addEventListener('click', handler)
         return () => document.removeEventListener('click', handler)
     }, [])
 
     const handler = (e: globalThis.MouseEvent) => {
+        if (ref == undefined) return
         if (ref.current && e.target instanceof Node)
             if (!ref.current.contains(e.target))
                 {
-                    setMenuInfo(prev => ({...prev, toggle: false}))
+                    setContextInfo((prev: contextInfo) => ({...prev, toggle: false}))
                 }
         }
 
     useEffect(() => {
-        setUpToDateData("")
+        pathChange(setCodeText, currentPath, dictionary, setUpToDateData, chache, socket, String(id), UpdateFunction, LinkDirectory)
     }, [currentPath])
-
-    function delay(ms: number) {
-        return new Promise(resolve => setTimeout(resolve, ms));
-    }
     
+    useEffect(() => {
+        console.log(LinkDirectory)
+    }, [LinkDirectory])
 
-    const saveEvent = (e: KeyboardEvent) => {
-        if  ((e.ctrlKey || e.metaKey) && e.key === "s") {
-            e.preventDefault()
-            if (allowSave && canModifyFiles){
-                setAllowSave(false)
-                if (currentPath != "")
-                    updateFile()
-                    .then(() => delay(250))
-                    .then(() => setAllowSave(true))
-            }
-        }
-    }
+    const setVisiblity = (x:number) => "fixed flex-shrink-0 z-40 h-screen p-2 flex gap-2 " + (sideTabIndex == x? "visible": "hidden")
     
     return (
-        <projectContext.Provider value={
-            {
-                isAdmin: true,
-                currentPath: currentPath,
-                ref: ref,
-                setContextInfo: setMenuInfo,
-                setCurrentPath: setCurentPath,
-                contextInfo: menuInfo,
-                transferInfo: transferInfo,
-                setTransferInfo: setTransferInfo,
-                data: codeText,
-                setData: setCodeText,
-                setPath: setCurentPath,
-                MenuInfo: RoleMenu,
-                setMenuInfo: setRoleMenu,
-                offsetH: ref.current?.offsetHeight? ref.current?.offsetHeight: 0
-            }
-        }>
-            <div className="flex h-screen w-screen"
-            onKeyDown={saveEvent}>
-                <ContextMenu x={menuInfo.x} y={menuInfo.y} toggle={menuInfo.toggle} children={menuInfo.children} ref={ref}/>
-                <SideBar setFunction={setShowExplorer} explorerActive={showExplorer}/>
-                <div className={"fixed ml-12 flex-shrink-0 z-40 h-screen p-2 flex gap-2 " + (showExplorer? "visible": "hidden")}>
+        <div className="flex h-screen w-screen"
+            onKeyDown={(e: React.KeyboardEvent) => saveFile(e, allowSave, setAllowSave, String(id), currentPath, canModifyFiles, codeText)}>
+            { enableSocket && <SocketHandler 
+                setDictionary={setDictionary} 
+                currentPath={currentPath} 
+                setUpToDateData={setUpToDateData} 
+                id={String(id)} 
+                codeText={codeText.data} 
+                setTabs={setTabs} 
+                RoleMenu={MenuInfo} 
+                setRoleMenu={setMenuInfo} 
+                permisonUpdateFunction={setFunction != undefined ? setFunction : () => {}} 
+                nav={nav} 
+                LinkSocket={socket} 
+                LiveUpdate={LiveUpdate} 
+                setLinkDirectory={setLinkDirectory} 
+            />}
+            <ContextMenu x={contextInfo.x} y={contextInfo.y} toggle={contextInfo.toggle} children={contextInfo.children} ref={ref}/>
+            <SideBar setFunction={setSideTabIndex} sideTabIndex={sideTabIndex} socket={socket}/>
+            <div>
+                <div className={setVisiblity(0)}>
                     <DirectoryViewer Dir={dictionary} />
-                    {RoleMenu.toggle && <RoleModifier />}
+                    {MenuInfo.toggle && <RoleModifier />}
                 </div>
-                    
-                    <CodeEditor data={codeText} onChange={(value) => setCodeText(value? value: "")} path={currentPath} upToDateData={upToDateData}
-                            setFunction={setCodeText} setFunction2={setUpToDateData} Tabs={tabs} setTabs={setTabs} root={dictionary} />
+                <div className={setVisiblity(1)}>
+                    <LinkManagePannel dir={dictionary}
+                        setChache={setChache}/>
+                </div>
+            </div>   
+                <CodeEditor data={codeText} onChange={(value) => setCodeText((prev: codeTextInterface) => ({...prev, data: value? value: ""}))} path={currentPath} upToDateData={!upToDateData}
+                 setUpToDateData={setUpToDateData} Tabs={tabs} setTabs={setTabs} root={dictionary} updateFunction={UpdateFunction}/>
             </div>
-        </projectContext.Provider>
-        
+         
     )
 }

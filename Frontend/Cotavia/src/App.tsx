@@ -5,10 +5,11 @@ import { useState, useEffect } from "react"
 import useGetUserProfile from "./hooks/useGetUserProfile"
 import LoadingScreen from "./components/general components/loading Screen/LoadingScreen"
 import { useNavigate } from "react-router"
+import data from "./data"
 function App() {
   
   const [profile, setProfile] = useState<Profile>({Displayname: "", pfp: "", username:""})
-  const [loaded, setLoaded] = useState<boolean>(false)
+  const [loaded, setLoaded] = useState<boolean>(data.devaloperMode? true: false)
   const nav = useNavigate()
   useEffect(() => {
       useGetUserProfile(setProfile)

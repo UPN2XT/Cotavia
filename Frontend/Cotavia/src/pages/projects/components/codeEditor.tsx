@@ -2,18 +2,21 @@ import Editor, { OnChange } from '@monaco-editor/react';
 import Tab from './Tab';
 import { useEffect } from 'react';
 import { Folder } from './DirectoryViewer';
-
+import { useRef } from 'react';
 interface useProps
 {
-    data: string
+    data: {
+        data: string,
+        type: string
+    }
     onChange: OnChange
     path: string
-    upToDateData: string
-    setFunction: Function
-    setFunction2: Function
+    upToDateData: boolean
+    setUpToDateData: Function
     Tabs: string[]
     setTabs: Function
     root: Folder
+    updateFunction: Function
 }
 
 export default function(parms: useProps) {
@@ -56,11 +59,12 @@ export default function(parms: useProps) {
         // Return the corresponding language or default to "plaintext"
         return extensionLanguageMap[fileExtension] || "plaintext";
     }
+
+    const upperRef = useRef<HTMLDivElement>(null)
     
     useEffect(() => {
         if (parms.path != "" && parms.Tabs.find(s => s == parms.path) == undefined)
         {
-            console.log("test")
             parms.setTabs((t: string[]) => [...t, parms.path])
         }
             
@@ -70,39 +74,56 @@ export default function(parms: useProps) {
 
     return (
         <div className="flex-grow max-h-screen">
-            
             <div className={"flex flex-col h-screen " + (parms.path? "visible": "hidden")}>
-                <div className='h-[8%] rounded-lg flex justify-between items-center pl-2 pt-2'>
-                    <div className='flex w-[90%] gap-1 overflow-scroll h-full'>
-                        {...tabs}
-                    </div>
-                    {parms.path != "" && 
-                    (
-                    <>
-                        <div className={'size-4 mr-2 rounded-full ' + ((parms.upToDateData != "") ? 'bg-yellow-300': 'bg-green-500')}
-                            onClick={() => {
-                                if (parms.upToDateData == "") 
-                                    return
-                                parms.setFunction(parms.upToDateData)
-                                parms.setFunction2("")
-                            }}>
+                <div ref={upperRef}>
+                    <div className='h-fit rounded-lg flex justify-between items-center pl-2 pt-2'>
+                            <div className='flex w-[90%] gap-1 overflow-scroll h-full'>
+                                {...tabs}
+                            </div>
+                            {parms.path != "" && 
+                            (
+                            <>
+                                <div className={'size-4 mr-2 rounded-full hover:cursor-pointer ' + ((parms.upToDateData) ? 'bg-yellow-300': 'bg-green-500')}
+                                    onClick={() => {
+                                        if (!parms.upToDateData) 
+                                            return
+                                        parms.setUpToDateData(true)
+                                        parms.updateFunction()
+                                    }}>
 
+                                </div>
+                            </>
+                        )}
                         </div>
-                    </>
-                )}
-                </div>
-                <div className='flex items-center pl-2 h-[3%] p-1 bg-neutral-900 bg-opacity-30 backdrop-blur-xl'>
-                    <text className="text-sm">{parms.path.replace("/", " > ")}</text>
-                </div>
-                <div className='max-h-[90%] h-[88%]'>
-                    <Editor className="" 
-                        defaultValue="" 
-                        theme="vs-dark"
-                        language={getLanguageFromPath(parms.path)}
-                        value={parms.data}
-                        onChange={parms.onChange} />
+
+                        <div className='flex items-center pl-2 h-fit p-1 bg-neutral-900 bg-opacity-30 backdrop-blur-xl'>
+                            <text className="text-sm">{parms.path.replace("/", " > ")}</text>
+                        </div>
                 </div>
                 
+                {
+                    parms.data.type.startsWith("text")? (
+                        <div className='max-h-[90%] flex-grow'
+                            style={{
+                                maxHeight: `calc(100vh - ${upperRef.current? upperRef.current.offsetHeight: 0}px)`
+                            }}>
+                            <Editor className="" 
+                                defaultValue="" 
+                                theme="vs-dark"
+                                language={getLanguageFromPath(parms.path)}
+                                value={parms.data.data}
+                                onChange={parms.onChange} />
+                        </div>
+                    ) : (
+                        <div className='flex justify-center items-center p-4 flex-grow'
+                            style={{
+                                maxHeight: `calc(100vh - ${upperRef.current? upperRef.current.offsetHeight: 0}px)`
+                            }}>
+                            <img src={parms.data.data}  className='max-w-full max-h-full w-fit rounded-sm'/>
+                        </div>
+                    )
+                }
+
                 </div>
                 <div className={'h-screen flex flex-grow justify-center items-center ' + (!parms.path? "visible": "hidden")}>
                         <div className='opacity-20 text-9xl hover:cursor-default font-medium'>

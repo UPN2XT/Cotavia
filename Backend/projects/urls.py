@@ -6,6 +6,7 @@ from .views.Filemanger import dirmanage, ModifyMange
 from .views.ProjectSettings.usersUpdate import getUsers, getConnectionsOutside, AddUser, removeUser
 
 urlpatterns = [
+    path("get/file", dirmanage.getFileRequest, name="getFile"),
     path("projectDirectory", views.createDoc, name="createDirectory"),
     path("getProjects", projectAcess.getProjects, name="getProjects"),
     path("permisions", projectAcess.getPermisionInfo, name="permisions"),

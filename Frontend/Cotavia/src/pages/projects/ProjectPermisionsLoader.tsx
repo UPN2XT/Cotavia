@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router";
 import useCrf from "../../hooks/useCrf";
 import data from "../../data";
+import LinkProvider from "../Link/components/LinkProvider";
+import ProjectDataProvider from "./projectDataProvider";
 
 export default function() {
 
@@ -14,7 +16,7 @@ export default function() {
         canModifyFiles: false,
     })
 
-    const [loaded, setLoaded] = useState<boolean>(false)
+    const [loaded, setLoaded] = useState<boolean>(data.devaloperMode? true: false)
     const {id} = useParams()
 
     const loadPerm = async () => {
@@ -31,17 +33,30 @@ export default function() {
     }
 
     useEffect(() => {
-        loadPerm()
-        .then(() => setLoaded(true))
+        try {
+            loadPerm()
+            .then(() => setLoaded(true))
+        }
+        catch {
+            if (data.devaloperMode)
+                setLoaded(true)
+        }
+        
     }, [])
     return (
-        <permisionContext.Provider value={{
-            ...perm,
-            setFunction: loadPerm
-        }}>
-            <div className={loaded? "visible": "hidden"}>
-                <Outlet />
-            </div>
-        </permisionContext.Provider>
+        
+            <permisionContext.Provider value={{
+                ...perm,
+                setFunction: loadPerm
+            }}>
+                <LinkProvider>
+                    <ProjectDataProvider>
+                        <div className={loaded? "visible": "hidden"}>
+                            <Outlet />
+                        </div>
+                    </ProjectDataProvider>
+                </LinkProvider>
+            </permisionContext.Provider>
+       
     )
 }

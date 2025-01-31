@@ -75,7 +75,7 @@ export default function() {
 
     useEffect(() => {
         const body = useCrf()
-        fetch(applicationData.host+"projects/getProjects", {method:'POST', body})
+        fetch(applicationData.host+"projects/getProjects", {method:'POST', body:body, credentials: 'include'})
         .then(res => res.json())
         .then(result => setProjects(result))
     }, [])

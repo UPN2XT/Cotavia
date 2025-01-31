@@ -1,4 +1,5 @@
 export default {
-    host: `http://${window.location.host}/`,
-    WsHost: `ws://${window.location.host}/`
+    host: `http://127.0.0.1:8000/`,
+    WsHost: `ws://127.0.0.1:8000/`,
+    devaloperMode: false
 }

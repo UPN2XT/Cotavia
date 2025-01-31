@@ -1,4 +1,4 @@
-import { DocumentTextIcon } from '@heroicons/react/16/solid'
+import { DocumentTextIcon, CodeBracketIcon, PhotoIcon } from '@heroicons/react/16/solid'
 import { ReactNode } from 'react'
 import FileContextMenu from './fileContextMenu';
 import { useContext } from "react"
@@ -8,15 +8,14 @@ interface useProps {
     path: string,
     folder: boolean,
     name: string,
-    data: string,
-    rootRef: string
+    type?: string
 }
 
 export default function(props:useProps)  {
 
-    const {setData, setCurrentPath, currentPath, setContextInfo, offsetH} = useContext<project>(projectContext)
+    const {setCurrentPath, currentPath, setContextInfo, offsetH} = useContext<project>(projectContext)
     const {id} = useParams()
-    const updateFunction = () => {setData(props.data); setCurrentPath(props.path)}
+    const updateFunction = () => {setCurrentPath(props.path)}
     
     const handleLeft = (e: React.MouseEvent<HTMLLIElement>, children: ReactNode) => {
         e.preventDefault()
@@ -26,10 +25,12 @@ export default function(props:useProps)  {
             x = e.clientX 
         else
             x = e.clientX 
-        if (e.clientY < window.innerHeight / 2)
+        if (e.clientY + offsetH < window.innerHeight)
             y = e.clientY
-        else
+        else if (e.clientY - offsetH < 0)
             y = e.clientY - offsetH
+        else
+            y = e.clientY - Math.abs((e.clientY - (e.clientY + offsetH)) % window.innerHeight)
         setContextInfo({
             x: x,
             y: y,
@@ -41,16 +42,20 @@ export default function(props:useProps)  {
 
     
     return  props.folder ? (  
-                <li className='list-none'
+                <li className='list-none text-lg'
                     onContextMenu={e => handleLeft(e, <FileContextMenu path={props.path} file={false} 
                         id={String(id)}/>)}>
                      {props.name}
                 </li>
             ): 
-            (<li onClick={updateFunction} className={'w-max flex items-center gap-2 font-semibold hover:cursor-default '+ (currentPath == props.path? "bg-purple-500 backdrop-blur-xl bg-opacity-30 p-2 rounded-md": "")}
+            (<li onClick={updateFunction} className={'w-max flex items-center gap-2 font-semibold hover:cursor-default text-lg '+ (currentPath == props.path? "bg-purple-500 backdrop-blur-xl bg-opacity-30 p-2 rounded-md": "")}
                 onContextMenu={e => handleLeft(e, <FileContextMenu path={props.path} file={true} 
                     id={String(id)}/>)}>
-                <DocumentTextIcon className='size-4'/>
+                {
+                    props.type != null && (props.type.startsWith("text")? <CodeBracketIcon className='size-5' />:
+                    props.type.startsWith("image")? <PhotoIcon className='size-5' />:
+                    <DocumentTextIcon className='size-5' />)
+                }
                 {props.name}
             </li>)
 }

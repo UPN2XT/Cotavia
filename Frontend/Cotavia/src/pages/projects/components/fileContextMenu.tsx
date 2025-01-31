@@ -5,6 +5,7 @@ import CreateField from "./createField"
 import useCrf from "../../../hooks/useCrf"
 import data from "../../../data"
 import { permisionContext, permisions } from "../../../context/permisionsContext"
+import getFile from "../../Link/scripts/getFile"
 
 
 export default function({path, file, id}: {path: string, file: boolean, id: string}) {
@@ -47,10 +48,23 @@ export default function({path, file, id}: {path: string, file: boolean, id: stri
         body.append("ID", id)
         body.append("path", path)
         body.append("type", file?"file":"folder")
-        const res = await fetch(data.host+`projects/filemanger/delete`, {
+        await fetch(data.host+`projects/filemanger/delete`, {
             method: "POST", body: body
         })
-        console.log(res.body)
+    }
+
+    const downloadFile = async () => {
+        const f = await getFile(path, id)
+        if (f == null) return
+        const url = window.URL.createObjectURL(f)
+        const a = document.createElement("a")
+        a.href = url
+        const name = path.split("/")
+        a.download = name[name.length - 1]
+        document.body.appendChild(a)
+        a.click()
+        document.removeChild(a)
+        window.URL.revokeObjectURL(url)
     }
     
 
@@ -95,6 +109,14 @@ export default function({path, file, id}: {path: string, file: boolean, id: stri
                             </button>
                         )
                     }
+
+                    {
+                        file && (
+                            <button className="w-full text-lg text-start rounded-md hover:bg-black hover:bg-opacity-15 p-2" onClick={downloadFile}>
+                                Download
+                            </button>
+                        )
+                    }
                     
                     {
                         isAdmin && (
@@ -103,7 +125,6 @@ export default function({path, file, id}: {path: string, file: boolean, id: stri
                              </button>
                         )
                     }
-
                     </>
                     )}
             

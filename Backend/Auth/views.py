@@ -7,6 +7,11 @@ import random
 from PIL import Image, ImageDraw, ImageFont
 from io import BytesIO
 from django.core.files.base import ContentFile
+from django.middleware.csrf import get_token
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.csrf import ensure_csrf_cookie
+
 
 def generate_letter_image(letter: str) -> ContentFile:
     letter = letter.upper() if letter.isalpha() else "?"
@@ -89,5 +94,9 @@ def logoutit(request: HttpRequest):
         return HttpResponseNotAllowed()
     logout(request)
     return HttpResponse()
+
+@ensure_csrf_cookie
+def get_csrf_token(request):
+    return JsonResponse({'csrfToken': get_token(request)})
         
 

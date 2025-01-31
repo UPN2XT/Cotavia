@@ -187,12 +187,15 @@ def getRoleRelatedToDir(request: HttpRequest):
     ok, project, type, name, action, target, path, id = basicCheck3(request, False)
     if not ok:
         return project
-    acessRole = target.allowedRoles.filter(users=request.user, isAdmin=True).first()
+    if target.limitedVisibility == True:
+        accessRoleName = target.allowedRoles.filter(users=request.user, isAdmin=True).first().roleName
+    else:
+        accessRoleName = ""
     if type == "folder":
-        rolesIn = target.allowedRoles.all().exclude(roleName=acessRole.roleName)
+        rolesIn = target.allowedRoles.all().exclude(roleName=accessRoleName)
         rolesOut = project.projectroles.exclude(roleconnnectedfolders=target)
     elif type == "file":
-        rolesIn = target.allowedRoles.all().exclude(roleName=acessRole.roleName)
+        rolesIn = target.allowedRoles.all().exclude(roleName=accessRoleName)
         rolesOut = project.projectroles.exclude(roleconnnectedfiles=target)
     else: 
         return HttpResponseBadRequest("{error: 'wrong type'}")

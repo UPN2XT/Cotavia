@@ -3,6 +3,8 @@ from ..models import Project, Folder, Role
 from .utils.filemanger import createPathTree
 from .utils.basicCheck import basicCheck, requestCheck, getProject, PROJECTNOTFOUNDERROR
 from ..forms.projectAcessForms import createProjectForm, IdAcessForm
+from rest_framework.views import APIView
+
 
 def createDoc(project: Project, user):
     return JsonResponse({
@@ -12,7 +14,7 @@ def createDoc(project: Project, user):
 
 def getProjects(request: HttpRequest):
     if not basicCheck(request, "POST"):
-        return HttpResponseBadRequest("{error: 'bad Request'}")
+        return HttpResponseBadRequest("{'error': 'bad Request'}")
     projectsList = {}
     projects = request.user.projectsin.all()
     for project in projects:

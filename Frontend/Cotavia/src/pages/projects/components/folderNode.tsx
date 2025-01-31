@@ -6,13 +6,12 @@ import { ChevronDownIcon, ChevronUpIcon} from "@heroicons/react/16/solid";
 interface useProps {
     root: Folder;
     path: String;
-    rootRef: string;
     subFolders: ReactNode[];
     subFiles: ReactNode[];
     isRoot: boolean;
 }
 
-export default function({root, path, rootRef, subFolders, subFiles, isRoot}: useProps) {
+export default function({root, path, subFolders, subFiles, isRoot}: useProps) {
     
     const [show, SetShow] = useState<boolean>(false)
     return (
@@ -22,10 +21,9 @@ export default function({root, path, rootRef, subFolders, subFiles, isRoot}: use
                 <div onClick={() => SetShow(s => !s)}
                     className="flex gap-1 items-center hover:cursor-default font-bold">
                     {
-                        !show ? (<ChevronDownIcon className="size-4"/>) : (<ChevronUpIcon className="size-4"/>)
+                        !show ? (<ChevronDownIcon className="size-5"/>) : (<ChevronUpIcon className="size-5"/>)
                     }
-                    <PathNode name={root.name} path={isRoot?"":path+root.name} folder={true} data=""  
-                        rootRef={rootRef} />
+                    <PathNode name={root.name} path={isRoot?"":path+root.name} folder={true} />
                 </div>
             </div>   
             {show && (

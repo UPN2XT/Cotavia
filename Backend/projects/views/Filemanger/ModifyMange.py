@@ -1,7 +1,7 @@
 from django.http import HttpRequest, HttpResponseBadRequest
 from ..utils.basicCheck import requestCheck, getProject, PROJECTNOTFOUNDERROR, ROLEDENIEDERROR, SucessMessage
 from ...forms.FilemangerForms import MoveForm, DeleteForm
-from ..utils.filemanger import getFile, getFolder, copyFolder, deleteFile, deleteFolder, createCopyName
+from ..utils.filemanger import getFile, getFolder, copyFolder, deleteFile, deleteFolder, createCopyName, createFileCopy
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
 from ...models import Project, File
@@ -30,22 +30,24 @@ def Move(request: HttpRequest):
     folder = getFolder(to, project.rootFolder, request.user)
     if folder == None:
         return ROLEDENIEDERROR
-    target.parentFolder = folder
+   
     if type == "folder":
-        neo = target.FolederName
+        x = target.FolederName
         i = 1
+        neo = x
         while folder.childrenfolders.filter(FolederName=neo):
-            neo = createCopyName(target.FolederName, i)
+            neo = createCopyName(x, i)
             i+=1
-        target.FolederName = neo
+        copy = copyFolder(request, target, id, to+f"/{neo}" if to!="" else neo)
+        copy.parentFolder = folder
+        copy.FolederName = neo
+        copy.save()
+        deleteFolder(request, From, project.rootFolder)
+    
     else:
-        neo = target.FileName
-        i = 1
-        while folder.childrenfiles.filter(FileName=neo):
-            neo = createCopyName(target.FileName, i)
-            i+=1
-        target.FileName = neo
-    target.save()
+        neo = createFileCopy(to, target, request, project.rootFolder, id).FileName
+        deleteFile(request, From, project.rootFolder)
+        
     
     groupSend(f"project_{id}", {
         "type": "project.update",
@@ -78,13 +80,14 @@ def Copy(request: HttpRequest):
     if folder == None:
         return ROLEDENIEDERROR
     if type == "folder":
-        copy = copyFolder(request, target)
-        copy.parentFolder = folder
-        neo = copy.FolederName
+        x = target.FolederName
+        neo = x
         i = 1
         while folder.childrenfolders.filter(FolederName=neo):
-            neo = createCopyName(copy.FolederName, i)
+            neo = createCopyName(x, i)
             i+=1
+        copy = copyFolder(request, target, id, to+f"/{neo}" if to!="" else neo)
+        copy.parentFolder = folder
         copy.FolederName = neo
         copy.save()
     elif type == "file":
@@ -93,9 +96,12 @@ def Copy(request: HttpRequest):
         while folder.childrenfiles.filter(FileName=neo):
             neo = createCopyName(target.FileName, i)
             i+=1
-        x = File.objects.create(FileName=neo, parentFolder=folder,
-            data=target.data, limitedVisibility=target.limitedVisibility)
+        x: File = createFileCopy(to, target, request, project.rootFolder, id)
+        if x == None:
+            return ROLEDENIEDERROR
+        x.limitedVisibility = target.limitedVisibility
         x.allowedRoles.set(target.allowedRoles.all())
+        x.save()
     
     groupSend(f"project_{id}", {
         "type": "project.update",

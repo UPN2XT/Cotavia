@@ -13,9 +13,15 @@ export interface SubFolders
     [key: string]: Folder
 }
 
+export interface FileContainer 
+{
+    version: number,
+    type: string
+}
+
 export interface SubFiles
 {
-    [key: string]: string
+    [key: string]: FileContainer
 }
 
 interface useProps {
@@ -32,12 +38,11 @@ export default function({Dir}: useProps) {
             const subFiles = []
             if (root.files != null)
                 for (const key in root.files)
-                    subFiles.push((<PathNone name={key} path={rootRef+key} folder={false} data={root.files[key]} 
-                            rootRef=""/>))
+                    subFiles.push((<PathNone name={key} path={rootRef+key} folder={false} type={root.files[key].type}/>))
             
             
             return (
-                <FolderNode root={root} rootRef={rootRef}
+                <FolderNode root={root} 
                     path={path} subFolders={subFolders} subFiles={subFiles} isRoot={isRoot}
                     />
             )

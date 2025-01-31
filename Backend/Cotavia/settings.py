@@ -38,7 +38,6 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-     'corsheaders',
     'Auth',
     'Coda',
     'projects',
@@ -50,11 +49,13 @@ MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    
 ]
+'django.middleware.csrf.CsrfViewMiddleware',
+
 
 ROOT_URLCONF = 'Cotavia.urls'
 
@@ -80,15 +81,18 @@ WSGI_APPLICATION = 'Cotavia.wsgi.application'
 CORS_ORIGIN_ALLOW_ALL = True
 CORS_ORIGIN_WHITELIST = (
   'http://localhost:5173', # or the reactjs address being used
+  "http://localhost:8000"
 )
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
+    "http://localhost:8000"
 ]
 CORS_ALLOW_ORIGIN_LIST = [
     "http://localhost:5173",
 ]
 CSRF_TRUSTED_ORIGINS = [
     "http://localhost:5173",
+    "http://localhost:8000"
 ]
 
 # Database
@@ -96,10 +100,21 @@ CSRF_TRUSTED_ORIGINS = [
 
 DATABASES = {
     'default': {
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'codavia',
+        'USER': "postgres",
+        'PASSWORD': "",
+        'HOST': "localhost",
+        "PORT": ""
+    }
+}
+
+'''
+    'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
     }
-}
+'''
 
 
 # Password validation

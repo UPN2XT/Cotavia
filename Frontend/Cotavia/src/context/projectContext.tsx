@@ -14,6 +14,12 @@ export interface InfoMenu {
     type: string
 }
 
+export interface codeTextInterface {
+    data: "",
+    type: ""
+}
+
+
 export interface project {
     isAdmin: boolean
     currentPath: string
@@ -28,7 +34,9 @@ export interface project {
     setPath: Function
     MenuInfo: InfoMenu
     setMenuInfo: Function
-    offsetH: number
+    offsetH: number,
+    codeText: codeTextInterface,
+    setCodeText: Function
 }
 
 const projectContext = createContext<project>({
@@ -58,7 +66,9 @@ const projectContext = createContext<project>({
         type:  ""
     },
     setMenuInfo: () => {},
-    offsetH: 0
+    offsetH: 0,
+    codeText: {type: "", data: ""},
+    setCodeText: () => {}
 });
 
 export {projectContext}

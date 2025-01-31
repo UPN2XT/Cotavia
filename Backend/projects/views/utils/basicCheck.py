@@ -23,12 +23,12 @@ def requestCheck(request: HttpRequest, Form: forms.Form, values: list[str]):
     analsis = {"error": False}
     if not basicCheck(request, "POST"):
         analsis["error"] = True
-        analsis["errorResponse"] = HttpResponseForbidden()
+        analsis["errorResponse"] = HttpResponseForbidden('{"error": "forbidden"}')
         return analsis
-    form = Form(request.POST)
+    form = Form(request.POST, request.FILES)
     if not form.is_valid():
         analsis["error"] = True
-        analsis["errorResponse"] = HttpResponseBadRequest()
+        analsis["errorResponse"] = HttpResponseBadRequest(f"{form.errors.as_data()}")
         return analsis
     for val in values:
         analsis[val] = form.cleaned_data[val]

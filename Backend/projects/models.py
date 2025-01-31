@@ -17,11 +17,13 @@ class Folder(models.Model):
     allowedRoles = models.ManyToManyField(Role, related_name="roleconnnectedfolders")
 
 class File(models.Model):
-    FileName = models.CharField(max_length=32)
+    FileName = models.CharField(max_length=128)
     parentFolder = models.ForeignKey(Folder, on_delete=models.CASCADE, related_name="childrenfiles", null=True)
-    data = models.TextField()
+    data = models.FileField(null=True, default=None, blank=True)
     limitedVisibility = models.BooleanField(default=False, blank=False)
     allowedRoles = models.ManyToManyField(Role, related_name="roleconnnectedfiles")
+    filetype = models.CharField(max_length=32, default=None, null=True)
+    version = models.IntegerField(default=0)
 
 
 class Project(models.Model):
