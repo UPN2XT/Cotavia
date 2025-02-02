@@ -11,19 +11,22 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
 from pathlib import Path
+import os
+from dotenv import load_dotenv 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+load_dotenv()
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-f3$#rfloun8x-4tyd@xzqn(hlp2q@uwy2r)pg4bj@2z@zt5_i4'
+SECRET_KEY = os.getenv("SECRET_KEY", "default-secret-key")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.getenv("DEBUG", "False") == "True"
 
 ALLOWED_HOSTS = []
 
@@ -45,7 +48,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
-    'corsheaders.middleware.CorsMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -54,7 +57,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     
 ]
-'django.middleware.csrf.CsrfViewMiddleware',
+
 
 
 ROOT_URLCONF = 'Cotavia.urls'
@@ -77,23 +80,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'Cotavia.wsgi.application'
 
-# Cores
-CORS_ORIGIN_ALLOW_ALL = True
-CORS_ORIGIN_WHITELIST = (
-  'http://localhost:5173', # or the reactjs address being used
-  "http://localhost:8000"
-)
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:5173",
-    "http://localhost:8000"
-]
-CORS_ALLOW_ORIGIN_LIST = [
-    "http://localhost:5173",
-]
-CSRF_TRUSTED_ORIGINS = [
-    "http://localhost:5173",
-    "http://localhost:8000"
-]
 
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
@@ -101,12 +87,12 @@ CSRF_TRUSTED_ORIGINS = [
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'codavia',
-        'USER': "postgres",
-        'PASSWORD': "",
-        'HOST': "localhost",
-        "PORT": ""
-    }
+        'NAME': os.getenv("DATABASE_NAME", "codavia"),
+        'USER': os.getenv("DATABASE_USER", "postgres"),
+        'PASSWORD': os.getenv("DATABASE_PASSWORD", ""),
+        'HOST': os.getenv("DATABASE_HOST", "localhost"),
+        'PORT': os.getenv("DATABASE_PORT", "5432"),
+    }  
 }
 
 '''
