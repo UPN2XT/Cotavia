@@ -71,7 +71,7 @@ export default function() {
     
 
     const roleComponents = roles.map(r => (
-        <RoleComponent role={r} id={String(id)}/>
+        <RoleComponent role={r} id={String(id)} setRoles={setRoles}/>
     ))
 
     return (

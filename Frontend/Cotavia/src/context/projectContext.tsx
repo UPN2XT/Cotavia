@@ -6,17 +6,20 @@ export interface TransferInfo {
     to: string,
     type: string,
     copy: false
+    FromUUID: string
 }
 
 export interface InfoMenu {
     path: string;
     toggle: boolean;
-    type: string
+    type: string;
+    UUID: string
 }
 
 export interface codeTextInterface {
-    data: "",
-    type: ""
+    data: string
+    type: string
+    UUID: string
 }
 
 
@@ -54,7 +57,8 @@ const projectContext = createContext<project>({
         from: "",
         to: "",
         type: "",
-        copy: false
+        copy: false,
+        FromUUID: ""
     },
     data: "",
     setTransferInfo: () => {},
@@ -63,11 +67,12 @@ const projectContext = createContext<project>({
     MenuInfo: {
         path: "",
         toggle: false,
-        type:  ""
+        type:  "",
+        UUID: ""
     },
     setMenuInfo: () => {},
     offsetH: 0,
-    codeText: {type: "", data: ""},
+    codeText: {type: "", data: "", UUID: ""},
     setCodeText: () => {}
 });
 

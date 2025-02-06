@@ -25,6 +25,7 @@ export const updateFile = async (currentPath: string, codeText: codeTextInterfac
         body.append('path', currentPath)
         body.append('data', file)
         body.append('Type', file.type)
+        body.append('UUID', codeText.UUID)
         fetch(applicationData.host+"projects/updateFile", {method: 'POST', body: body})
         .then(res => console.log(res.status))
 }

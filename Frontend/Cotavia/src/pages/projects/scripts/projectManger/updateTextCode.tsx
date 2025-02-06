@@ -19,7 +19,7 @@ export default async function(
             dx = await result.text()
         if (file.type.startsWith('image')) 
             dx = URL.createObjectURL(result);
-        setCodeText({data: dx, type: file.type})
+        setCodeText({data: dx, type: file.type, UUID: file.UUID})
             setChache((prev: cache) => ({...prev, [currentPath]: {
                     file: file,
                     data: dx

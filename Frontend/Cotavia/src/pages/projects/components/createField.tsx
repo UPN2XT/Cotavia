@@ -7,6 +7,7 @@ interface useProps{
     id: string,
     rootRef: string,
     toggleFunction: Function
+    UUID: string
 }
 
 export default function(props: useProps) {
@@ -25,6 +26,7 @@ export default function(props: useProps) {
         body.append('ID', props.id)
         body.append('path', path)
         body.append('name', name)
+        body.append('UUID', props.UUID)
         file && body.append('data', file)
         body.append("Type", type)
         fetch(applicationData.host+`projects/create/${isFile?"file":"folder"}`, {method:"POST", body: body})

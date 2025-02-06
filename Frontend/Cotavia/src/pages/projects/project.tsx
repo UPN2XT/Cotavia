@@ -25,7 +25,8 @@ export default function() {
         { 
             name: '', 
             folders: {}, 
-            files: {}
+            files: {},
+            UUID: ""
         } 
     )
     const {currentPath, ref, setContextInfo, codeText, setCodeText, 
@@ -61,7 +62,7 @@ export default function() {
 
     const UpdateFunction = async (file: FileContainer | null = getFile(dictionary, currentPath)) => {
         if (file == null) return
-        let result = await getFileFromServer(currentPath, String(id))
+        let result = await getFileFromServer(file.UUID, String(id))
 
         updateTextCode(setCodeText, currentPath, socket, String(id), setChache, file, result, true)
     }
@@ -75,7 +76,8 @@ export default function() {
                 setDictionary({
                     name: "root", 
                     files: {},
-                    folders: {}
+                    folders: {},
+                    UUID: ""
                 })
         }
         document.addEventListener('click', handler)

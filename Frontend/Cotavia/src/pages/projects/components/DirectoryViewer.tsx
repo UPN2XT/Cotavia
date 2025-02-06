@@ -4,24 +4,16 @@ import FolderNode from "./folderNode"
 export interface Folder 
 {
     name: string,
-    folders: SubFolders,
-    files: SubFiles 
-}
-
-export interface SubFolders
-{
-    [key: string]: Folder
+    UUID: string,
+    folders: {[name: string]: Folder},
+    files:  {[name: string]: FileContainer},
 }
 
 export interface FileContainer 
 {
     version: number,
-    type: string
-}
-
-export interface SubFiles
-{
-    [key: string]: FileContainer
+    type: string,
+    UUID: string
 }
 
 interface useProps {
@@ -38,7 +30,8 @@ export default function({Dir}: useProps) {
             const subFiles = []
             if (root.files != null)
                 for (const key in root.files)
-                    subFiles.push((<PathNone name={key} path={rootRef+key} folder={false} type={root.files[key].type}/>))
+                    subFiles.push((<PathNone name={key} path={rootRef+key} folder={false} type={root.files[key].type}
+                        UUID={root.files[key].UUID}/>))
             
             
             return (

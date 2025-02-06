@@ -9,7 +9,6 @@ from io import BytesIO
 from django.core.files.base import ContentFile
 from django.middleware.csrf import get_token
 from django.http import JsonResponse
-from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.csrf import ensure_csrf_cookie
 
 

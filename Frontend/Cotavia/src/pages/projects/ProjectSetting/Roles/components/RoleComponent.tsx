@@ -14,11 +14,12 @@ export interface Role {
 }
 
 interface useProps {
-    role: Role;
-    id: string
+    role: Role
+    id: string,
+    setRoles: Function
 }
 
-export default function({role, id}: useProps) {
+export default function({role, id, setRoles}: useProps) {
 
     const [show, setShow] = useState<boolean>(false)
     const [roleState, setRoleState] = useState<Role>(role)
@@ -37,6 +38,31 @@ export default function({role, id}: useProps) {
         })()
     }) 
     .then(result => result.status == 200 && setDisabled(false))
+
+    const dele = () => fetch(data.host+"projects/settings/roles/updateRole", {
+        method: "POST",
+        body: (() => {
+            setDisabled(true)
+            const body = useCrf()
+            body.append("action", "delete")
+            body.append("ID", id)
+            body.append("data", JSON.stringify(roleState))
+            return body
+        })()
+    })
+    .then(res => {
+        if (res.status != 200) {
+            setDisabled(false)
+            return
+        }
+        setRoles((p: Role[]) => {
+            const neo = []
+            for (const k in p)
+                if (p[k].name != role.name)
+                    neo.push(p[k])
+            return neo
+        })
+    })
 
     return (
         <div className="bg-neutral-900 rounded-2xl p-4 w-full">
@@ -61,7 +87,7 @@ export default function({role, id}: useProps) {
                     <div className="flex justify-end">
                         {!role.isDefualt && (
                             <button className="bg-red-500 p-3 font-bold rounded-xl m-4"
-                                disabled={disabled}>
+                                disabled={disabled} onClick={dele}>
                                 Delete
                             </button>
                         )}

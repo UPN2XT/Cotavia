@@ -1,20 +1,22 @@
-from ..models import User
 from django.contrib.auth import authenticate, login
 from .serializers import LoginSerializer
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
+from django.views.decorators.csrf import csrf_protect
+from django.utils.decorators import method_decorator
 
-class login(APIView):
-    def post(request):
+@method_decorator(csrf_protect, name='dispatch')
+class Login(APIView):
+    def post(self, request):
         
-        serializer = LoginSerializer(request.POST)
+        serializer = LoginSerializer(data=request.data)
         if not serializer.is_valid():
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
         try:
-            username = serializer.cleaned_data["username"]
-            password = serializer.cleaned_data["password"]
+            username = serializer.validated_data["username"]
+            password = serializer.validated_data["password"]
             
             try:
                 user = authenticate(request, username=username, password=password)

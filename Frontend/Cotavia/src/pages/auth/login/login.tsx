@@ -22,14 +22,14 @@ export default function() {
         const d = useCrf()
         d.append("username", data.username)
         d.append('password', data.password)
-        const response = await fetch(ApplicationData.host + "auth/login", 
+        const response = await fetch(ApplicationData.host + "api/auth/login", 
             {
                 method: "POST",
                 body: d,
             }
         )
 
-        if (response.status == 200)
+        if (response.status == 201)
             nav("../../")
 
         const {error} = await response.json()

@@ -8,7 +8,8 @@ export default function({children}: {children: React.ReactNode}) {
     const ref = useRef<HTMLDivElement | null>(null)
     const [codeText, setCodeText] = useState<codeTextInterface>({
         data: "",
-        type: ""
+        type: "",
+        UUID: ""
     })
     const [currentPath, setCurentPath] = useState<string>("")
     const [menuInfo, setMenuInfo] = useState<contextInfo>({
@@ -17,13 +18,16 @@ export default function({children}: {children: React.ReactNode}) {
     const [RoleMenu, setRoleMenu] = useState<InfoMenu>({
         path: "",
         toggle: false,
-        type: ""
+        type: "",
+        UUID: ""
     })
 
-    const [transferInfo, setTransferInfo] = useState<TransferInfo>({   from: "",
+    const [transferInfo, setTransferInfo] = useState<TransferInfo>({   
+            from: "",
             to: "",
             type: "",
-            copy: false
+            copy: false,
+            FromUUID: ""
         })
 
     return (

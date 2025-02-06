@@ -6,11 +6,12 @@ from django.contrib.auth.models import User
 from django.contrib.auth import login
 from django.http import HttpRequest
 from .serializers import SignupSerializer  
-from ..models import Profile
+from userConnections.models import Profile
 from PIL import Image, ImageDraw, ImageFont
 from django.core.files.base import ContentFile
 import random
-
+from django.views.decorators.csrf import csrf_protect
+from django.utils.decorators import method_decorator
 
 def generate_letter_image(letter: str) -> ContentFile:
     letter = letter.upper() if letter.isalpha() else "?"
@@ -30,6 +31,7 @@ def generate_letter_image(letter: str) -> ContentFile:
     return ContentFile(byte_io.getvalue(), f"{letter}_profile.png")
 
 class SignupView(APIView):
+
     def post(self, request: HttpRequest):
         serializer = SignupSerializer(data=request.data)
 

@@ -13,14 +13,14 @@ export default async function(
     if (currentPath == "") {
         setCodeText({
             data: "",
-            type: ""
+            type: "",
+            uuid: ""
         })
     }
     const file = getFile(dictionary, currentPath)
     if (file != null) {
         if (chache[currentPath] != null) {
-        if (typeof chache[currentPath].data == "string")
-            setCodeText({data: chache[currentPath].data, type:chache[currentPath].file.type})
+            setCodeText({data: chache[currentPath].data, type:chache[currentPath].file.type, UUID: chache[currentPath].file.UUID})
             setUpToDateData(chache[currentPath].file.version == file.version)
             return
         }
@@ -32,7 +32,8 @@ export default async function(
                     event: "get/file",
                     data: {
                         ID: id,
-                        path: currentPath
+                        path: currentPath,
+                        
                     }
                 }))
                 return

@@ -8,7 +8,7 @@ import { permisionContext, permisions } from "../../../context/permisionsContext
 import getFile from "../../Link/scripts/getFile"
 
 
-export default function({path, file, id}: {path: string, file: boolean, id: string}) {
+export default function({path, file, id, UUID}: {path: string, file: boolean, id: string, UUID: string}) {
 
     const {setContextInfo, setTransferInfo, transferInfo, setMenuInfo} = useContext<project>(projectContext)
     const {canModifyFiles, canCreate, canDelete, isAdmin} = useContext<permisions>(permisionContext)
@@ -19,12 +19,12 @@ export default function({path, file, id}: {path: string, file: boolean, id: stri
 
     const showRoleMenu = () => {
         toggleOff()
-        setMenuInfo({ path: path, toggle: true, type: file? "file": "folder"})
+        setMenuInfo({ path: path, toggle: true, type: file? "file": "folder", UUID: UUID})
     }
     
     const move = (cut: boolean) => {
         toggleOff()
-        setTransferInfo({from: path, type:file?"file":"folder", copy:!cut, to:""})
+        setTransferInfo({from: path, type:file?"file":"folder", copy:!cut, to:"", FromUUID: UUID})
     }
 
     const paste = async () => {
@@ -33,9 +33,12 @@ export default function({path, file, id}: {path: string, file: boolean, id: stri
         body.append("ID", id)
         body.append("From", transferInfo.from)
         body.append("To", path)
-        body.append("type", transferInfo.type)
+        body.append("Type", transferInfo.type)
+        body.append("mode", transferInfo.copy? "copy": "cut")
+        body.append("UUIDFrom", transferInfo.FromUUID)
+        body.append("UUIDTo", UUID)
         setTransferInfo({from: "", type:file?"file":"folder", copy:false, to:""})
-        fetch(data.host+`projects/filemanger/${transferInfo.copy? "copy": "cut"}`,
+        fetch(data.host+`projects/filemanger/move`,
             {
                 method: "POST", body: body
             }
@@ -47,7 +50,8 @@ export default function({path, file, id}: {path: string, file: boolean, id: stri
         const body = useCrf()
         body.append("ID", id)
         body.append("path", path)
-        body.append("type", file?"file":"folder")
+        body.append("Type", file?"file":"folder")
+        body.append("UUID", UUID)
         await fetch(data.host+`projects/filemanger/delete`, {
             method: "POST", body: body
         })
@@ -72,7 +76,7 @@ export default function({path, file, id}: {path: string, file: boolean, id: stri
         <>
             {!file && (
                 <>
-                {canCreate && <CreateField id={id} rootRef={path} toggleFunction={toggleOff}/>}
+                {canCreate && <CreateField id={id} rootRef={path} toggleFunction={toggleOff} UUID={UUID}/>}
                 {
                     transferInfo.from != "" && transferInfo.from != path && canModifyFiles && (
                         <button className="w-full text-lg text-start rounded-md hover:bg-black hover:bg-opacity-15 p-2"

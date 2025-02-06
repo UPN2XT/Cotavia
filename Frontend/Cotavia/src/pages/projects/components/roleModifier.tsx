@@ -16,6 +16,9 @@ export default function() {
     }>({In: [], Out: [], visblity: "F"})
     const {id} = useParams()
 
+    const [added, setAdd] = useState<string[]>([])
+    const [removed, setRemoved] = useState<string[]>([])
+
     const createData = (s: {[x: number]: string}) => {
         const In = []
         for (const i in s)
@@ -23,13 +26,14 @@ export default function() {
         return In
     }
 
-    const modifyRole = async (remove: boolean, name: string) => {
+    const save = async () => {
         const body = useCrf()
         body.append("ID", String(id))
-        body.append("type", MenuInfo.type)
+        body.append("Type", MenuInfo.type)
+        body.append("UUID", MenuInfo.UUID)
+        body.append("add", JSON.stringify(added))
+        body.append("remove", JSON.stringify(removed))
         body.append("path", MenuInfo.path)
-        body.append("action", remove? "remove": "add")
-        body.append("name", name)
         const res = await fetch(data.host+"projects/roles/dir/update", {
             method: "POST",
             body: body
@@ -37,6 +41,19 @@ export default function() {
 
         if (res.status != 200)
             return
+
+        setAdd([])
+        setRemoved([])
+    }
+
+    const modifyRole = async (remove: boolean, name: string) => {
+        if (remove) {
+            setRemoved(prev => [...prev, name])
+            setAdd(prev => prev.filter(e => e != name))
+        } else {
+            setAdd(prev => [...prev, name])
+            setRemoved(prev => prev.filter(e => e != name))
+        }
 
         const re = (s: string[]) => s.filter(e => e != name)
         const add = (s: string[]) => [...s, name]
@@ -75,8 +92,8 @@ export default function() {
     const loadInfo =  () => {
             const body = useCrf()
             body.append("ID", String(id))
-            body.append("type", MenuInfo.type)
-            body.append("path", MenuInfo.path)
+            body.append("Type", MenuInfo.type)
+            body.append("UUID", MenuInfo.UUID)
             fetch(data.host+"projects/roles/dir/get", {method: "POST", body:body})
             .then(res => res.json())
             .then(result => {
@@ -111,9 +128,10 @@ export default function() {
                     onChange={async (e) => {
                         const body = useCrf()
                         body.append("ID", String(id))
-                        body.append("type", MenuInfo.type)
+                        body.append("Type", MenuInfo.type)
                         body.append("path", MenuInfo.path)
                         body.append("action", e.target.value)
+                        body.append("UUID", MenuInfo.UUID)
                         const res = await fetch(data.host+"projects/roles/dir/visiblity", {
                             method: "POST",
                             body: body
@@ -130,6 +148,11 @@ export default function() {
                     </option>
                 </select>
             </div>
+            <button className="w-full bg-green-500 rounded-lg flex 
+                    justify-center items-center pt-2 pb-2 pl-3 pr-3"
+                onClick={save}>
+                Save
+            </button>
             {
                 roles.In.length > 0 && (
                     <>

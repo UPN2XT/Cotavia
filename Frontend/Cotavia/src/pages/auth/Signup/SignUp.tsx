@@ -30,14 +30,14 @@ export default function() {
             d.append('password', data.password)
             d.append('displayname', data.displayname)
             d.append("email", data.email)
-            const response = await fetch(ApplicationData.host + "auth/signup", 
+            const response = await fetch(ApplicationData.host + "api/auth/signup", 
                 {
                     method: "POST",
                     body: d,
                 }
             )
     
-           if (response.status == 200)
+           if (response.status == 201)
            {
                 nav("../../")
                 return

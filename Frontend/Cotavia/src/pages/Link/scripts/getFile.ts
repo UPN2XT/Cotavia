@@ -1,10 +1,10 @@
 import useCrf from "../../../hooks/useCrf"
 import data from "../../../data"
 
-export default async function(path: string, id: string) {
+export default async function(UUID: string, id: string) {
     const body = useCrf()
     body.append("ID", id)
-    body.append("path", path)
+    body.append("UUID", UUID)
     const res = await fetch(data.host+"projects/get/file", {method: "POST", body: body})
     if (res.status != 200)
             return null

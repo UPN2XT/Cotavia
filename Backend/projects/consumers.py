@@ -3,7 +3,7 @@ from channels.exceptions import DenyConnection
 from asgiref.sync import async_to_sync
 from Auth.models import User
 import json
-from .views.utils.filemanger import getFolder, getFile
+from .api.utils.filemanger.GetFunctions import get_file, get_folder
 from .models import Project
 
 class ProjectConsumer(WebsocketConsumer):
@@ -46,37 +46,46 @@ class ProjectConsumer(WebsocketConsumer):
         
         if event["event"] == "role/change":
             if event["Type"] == "folder":
-                target = getFolder(event["path"], self.project.rootFolder, self.user)
+                target = get_folder(event["UUID"], self.project, self.user)
             else:
-                target = getFile(event["path"], self.project.rootFolder, self.user)
+                target =  get_file(event["UUID"], self.project, self.user)
             if target == None:
                 event["event"] = "delete"+"/"+event["Type"]
                 metaData["event"] = "delete"
             else:
                 return
         if event["event"] == "create/folder":
-            folder = getFolder(event["path"], self.project.rootFolder, self.user)
+            folder =  get_folder(event["UUID"], self.project, self.user)
             metaData["path"] = event["path"]
             if folder == None:
                 return
-            metaData["name"] =  event["name"]
+            metaData["name"] = event["name"]
+            metaData["UUID"] = event["UUID"]
+            metaData["pUUID"] = event["pUUID"]
             
         if event["event"] == "update/file":
-            file = getFile(f'{event["path"]}/{event["name"]}', self.project.rootFolder, self.user)
+            file = get_file(event["data"]["UUID"], self.project, self.user)
             metaData["path"] = event["path"]
             if file == None:
                 return
             metaData["data"] = event["data"]
             metaData["name"] =  event["name"]
+            metaData["pUUID"] = event["pUUID"]
 
         
         if "copy" in event["event"] or "cut" in event["event"]:
             metaData["from"] = event["from"]
             metaData["to"] = event["to"]
             metaData["name"] = event["name"]
+            metaData["pUUID"] =  event["pUUID"]
+            metaData["pUUID2"] =  event["pUUID2"]
+
+        if "copy" in event["event"]:
+            metaData["UUIDData"] = event["UUIDData"]
         
         if "delete" in event["event"]:
             metaData["path"] = event["path"]
+            metaData["pUUID"] = event["UUID"]
 
         self.send(text_data=json.dumps(metaData))
 

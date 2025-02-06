@@ -5,7 +5,9 @@ import { Folder } from "../../components/DirectoryViewer";
 export default function (
     setDictionary: Function, id: string, setTabs: Function,
         RoleMenu: InfoMenu, setRoleMenu: Function, LinkSocket: WebSocket | null, LiveUpdate: boolean,
-        setLinkDirectory: Function, parms: string[], data: {from: string, to: string, name: string}
+        setLinkDirectory: Function, parms: string[], data: {from: string, to: string, name: string, pUUID2: string, pUUID: string,
+            UUIDData: {[name: string]: string}
+        }
 ) {
     const u = String(data["from"]).split("/")
     LiveUpdate && LinkSocket?.send(JSON.stringify({
@@ -17,8 +19,9 @@ export default function (
             dest: parms[1] == "file"? data["to"]: data["to"] + "/" + u[u.length - 1]
         }
     }))    
-    setDictionary((d: Folder) => Move(d, data["from"],data["to"], parms[1] == "folder", data["name"]))
-    LiveUpdate && setLinkDirectory((d: Folder) => Move(d, data["from"],data["to"], parms[1] == "folder", data["name"]))
+    const isCopy = parms[0] == "copy"
+    setDictionary((d: Folder) => Move(d, data["from"],data["to"], parms[1] == "folder", data["name"], data["UUIDData"], isCopy, data["pUUID"]))
+    LiveUpdate && setLinkDirectory((d: Folder) => Move(d, data["from"],data["to"], parms[1] == "folder", data["name"], data["UUIDData"], isCopy, data["pUUID"]))
     if (parms[0] == "cut") {
         if (parms[1] == 'file')
             setTabs((s: string[]) => s.map(e => e == data["from"]? data["from"]: e))
@@ -28,8 +31,8 @@ export default function (
                     return e
                 return e.replace(data["from"], data["to"])
             }))
-        setDictionary((d: Folder) => Delete(d, data["from"], parms[1] == "folder"))
-        LiveUpdate && setLinkDirectory((d: Folder) => Delete(d, data["from"], parms[1] == "folder"))
+        setDictionary((d: Folder) => Delete(d, data["from"], parms[1] == "folder", data["pUUID2"]))
+        LiveUpdate && setLinkDirectory((d: Folder) => Delete(d, data["from"], parms[1] == "folder", data["pUUID2"]))
         const x = data["from"].split("/")
         if (RoleMenu.path == data["from"]) setRoleMenu((prev: InfoMenu) => ({
             ...prev,

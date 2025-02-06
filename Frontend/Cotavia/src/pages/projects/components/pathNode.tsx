@@ -8,7 +8,8 @@ interface useProps {
     path: string,
     folder: boolean,
     name: string,
-    type?: string
+    type?: string,
+    UUID: string
 }
 
 export default function(props:useProps)  {
@@ -44,13 +45,13 @@ export default function(props:useProps)  {
     return  props.folder ? (  
                 <li className='list-none text-lg'
                     onContextMenu={e => handleLeft(e, <FileContextMenu path={props.path} file={false} 
-                        id={String(id)}/>)}>
+                        id={String(id)} UUID={props.UUID}/>)}>
                      {props.name}
                 </li>
             ): 
             (<li onClick={updateFunction} className={'w-max flex items-center gap-2 font-semibold hover:cursor-default text-lg '+ (currentPath == props.path? "bg-purple-500 backdrop-blur-xl bg-opacity-30 p-2 rounded-md": "")}
                 onContextMenu={e => handleLeft(e, <FileContextMenu path={props.path} file={true} 
-                    id={String(id)}/>)}>
+                    id={String(id)} UUID={props.UUID}/>)}>
                 {
                     props.type != null && (props.type.startsWith("text")? <CodeBracketIcon className='size-5' />:
                     props.type.startsWith("image")? <PhotoIcon className='size-5' />:

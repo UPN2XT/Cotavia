@@ -23,7 +23,8 @@ export default function({root, path, subFolders, subFiles, isRoot}: useProps) {
                     {
                         !show ? (<ChevronDownIcon className="size-5"/>) : (<ChevronUpIcon className="size-5"/>)
                     }
-                    <PathNode name={root.name} path={isRoot?"":path+root.name} folder={true} />
+                    <PathNode name={root.name} path={isRoot?"":path+root.name} folder={true} 
+                        UUID={root.UUID}/>
                 </div>
             </div>   
             {show && (

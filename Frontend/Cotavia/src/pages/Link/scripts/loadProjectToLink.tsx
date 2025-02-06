@@ -27,7 +27,8 @@ export default function update(ref: Folder | null, linkDir: Folder | null, path:
         linkDir = {
             "name": 'x',
             files: {},
-            folders: {}
+            folders: {},
+            UUID: ""
         }
     }
         
