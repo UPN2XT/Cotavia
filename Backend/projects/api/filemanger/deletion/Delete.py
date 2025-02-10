@@ -23,13 +23,7 @@ class DeleteF(APIView):
         
         id = serializer.validated_data["ID"]
         UUID = serializer.validated_data["UUID"]
-        path = serializer.validated_data["path"]
         Type = serializer.validated_data["Type"]
-
-        try:
-            path = serializer.validated_data["path"]
-        except:
-            path = ""
 
         project: Project = getProject(id, request)
 
@@ -48,7 +42,6 @@ class DeleteF(APIView):
         
         sendMessage( project, {  
             "event": f"delete/{Type}",
-            "path": path,
             "UUID": str(UUID)
         })
         

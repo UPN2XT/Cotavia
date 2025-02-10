@@ -56,7 +56,6 @@ class ProjectConsumer(WebsocketConsumer):
                 return
         if event["event"] == "create/folder":
             folder =  get_folder(event["UUID"], self.project, self.user)
-            metaData["path"] = event["path"]
             if folder == None:
                 return
             metaData["name"] = event["name"]
@@ -65,7 +64,6 @@ class ProjectConsumer(WebsocketConsumer):
             
         if event["event"] == "update/file":
             file = get_file(event["data"]["UUID"], self.project, self.user)
-            metaData["path"] = event["path"]
             if file == None:
                 return
             metaData["data"] = event["data"]
@@ -74,8 +72,6 @@ class ProjectConsumer(WebsocketConsumer):
 
         
         if "copy" in event["event"] or "cut" in event["event"]:
-            metaData["from"] = event["from"]
-            metaData["to"] = event["to"]
             metaData["name"] = event["name"]
             metaData["pUUID"] =  event["pUUID"]
             metaData["pUUID2"] =  event["pUUID2"]
@@ -84,8 +80,11 @@ class ProjectConsumer(WebsocketConsumer):
             metaData["UUIDData"] = event["UUIDData"]
         
         if "delete" in event["event"]:
-            metaData["path"] = event["path"]
             metaData["pUUID"] = event["UUID"]
+
+        if 'rename' in event['event']:
+            metaData["UUID"] = event["UUID"]
+            metaData["name"] = event["name"]
 
         self.send(text_data=json.dumps(metaData))
 

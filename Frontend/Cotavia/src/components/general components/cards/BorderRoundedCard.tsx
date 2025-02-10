@@ -8,7 +8,7 @@ interface useProps {
 
 export default function(props: useProps) {
     return (
-        <div className={"flex-shrink-0 bg-black backdrop-blur-xl bg-opacity-25 rounded-lg p-4 "+props.classes}>
+        <div className={"flex-shrink-0 bg-black backdrop-blur-xl bg-opacity-35 rounded-lg p-4 "+props.classes}>
             {props.children}
         </div>
     )

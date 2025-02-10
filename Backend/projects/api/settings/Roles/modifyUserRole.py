@@ -22,7 +22,7 @@ class EditUsersRole(APIView):
         id: str = serializer.validated_data["ID"]
         name = serializer.validated_data["name"]
         username = serializer.validated_data["username"]
-        action = serializer.validated_data["name"]
+        action = serializer.validated_data["action"]
 
         project = getProject(id, request)
         if project == None:
@@ -32,7 +32,6 @@ class EditUsersRole(APIView):
             return Response({"error": "RD"}, status=status.HTTP_403_FORBIDDEN)
         
         role = project.projectroles.get(roleName=name)
-        
         if action == "remove":
             user = role.users.filter(username=username).first()
             if user == None:
@@ -50,5 +49,5 @@ class EditUsersRole(APIView):
              "event": "role/change/reload"
         })
 
-        return Response({"message": "success"})
+        return Response({"message": "ok"})
             

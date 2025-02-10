@@ -27,14 +27,8 @@ class MoveF(APIView):
         id = serializer.validated_data["ID"]
         UUIDFolder = serializer.validated_data["UUIDTo"]
         UUIDTarget = serializer.validated_data["UUIDFrom"]
-        From = serializer.validated_data["From"]
         Type = serializer.validated_data["Type"]
         mode = serializer.validated_data["mode"]
-
-        try:
-            To = serializer.validated_data["To"]
-        except:
-            To = ""
 
         project: Project = getProject(id, request)
 
@@ -67,8 +61,6 @@ class MoveF(APIView):
         
         sendMessage( project, {  
             "event": f"{mode}/{Type}",
-            "from": From,
-            "to": To,
             "name": target,
             "UUIDData": UUIDData,
             "pUUID": str(pUUID), 

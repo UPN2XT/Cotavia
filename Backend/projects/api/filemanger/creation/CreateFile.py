@@ -28,11 +28,6 @@ class CreateFile(APIView):
         Type = serializer.validated_data["Type"]
         data = serializer.validated_data["data"]
 
-        try:
-            path = serializer.validated_data["path"]
-        except:
-            path = ""
-
         project: Project = getProject(id, request)
 
         if not project:
@@ -47,7 +42,6 @@ class CreateFile(APIView):
 
         sendMessage( project, {  
             "event": "update/file",
-            "path": path,
             "name": file.name,
             "data": {
                 "version": file.version,

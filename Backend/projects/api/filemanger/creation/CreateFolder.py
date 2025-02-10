@@ -25,10 +25,6 @@ class CreateFolder(APIView):
         id = serializer.validated_data["ID"]
         name = serializer.validated_data["name"]
         UUID = serializer.validated_data["UUID"]
-        try:
-            path = serializer.validated_data["path"]
-        except:
-            path = ""
 
         project: Project = getProject(id, request)
 
@@ -44,7 +40,6 @@ class CreateFolder(APIView):
         
         sendMessage( project, {  
             "event": "create/folder",
-            "path": path,
             "name": folder.name,
             "UUID": str(folder.UUID),
             "pUUID": str(UUID)

@@ -13,7 +13,7 @@ import random
 from django.views.decorators.csrf import csrf_protect
 from django.utils.decorators import method_decorator
 
-def generate_letter_image(letter: str) -> ContentFile:
+def generate_letter_image(letter: str, username) -> ContentFile:
     letter = letter.upper() if letter.isalpha() else "?"
     img_size = (256, 256)
     bg_color = tuple(random.randint(0, 255) for _ in range(3))
@@ -23,13 +23,16 @@ def generate_letter_image(letter: str) -> ContentFile:
         font = ImageFont.truetype("arial.ttf", 150)  # TODO: change path
     except IOError:
         font = ImageFont.load_default()
-    text_size = draw.textsize(letter, font=font)
+    # Get the bounding box of the text
+    bbox = draw.textbbox((0, 0), letter, font=font)
+    text_size = (draw.textlength(letter, font=font), font.size)
     text_position = ((img_size[0] - text_size[0]) // 2, (img_size[1] - text_size[1]) // 2)
     draw.text(text_position, letter, fill="white", font=font)
     byte_io = BytesIO()
     image.save(byte_io, "PNG")
-    return ContentFile(byte_io.getvalue(), f"{letter}_profile.png")
+    return ContentFile(byte_io.getvalue(), f"{username}_profile.png")
 
+@method_decorator(csrf_protect, name='dispatch')
 class SignupView(APIView):
 
     def post(self, request: HttpRequest):
@@ -54,7 +57,7 @@ class SignupView(APIView):
         profile = Profile.objects.create(displayName=displayname, user=user)
 
         # Generate profile picture
-        pfp = generate_letter_image(displayname[0])
+        pfp = generate_letter_image(displayname[0], user.username)
         profile.pfp.save(f"{user.username}_profile.png", pfp)
 
         # Log in the user

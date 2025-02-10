@@ -44,8 +44,6 @@ export function createFolder(d: Folder, data: any): Folder {
     path.forEach(p => {
         current.folders!=null && p in current.folders && (current = current.folders[p])
     })
-    if (current.UUID != data["pUUID"])
-        return dir
     const f: Folder = {
         name: data["name"],
         folders: {},
@@ -65,14 +63,12 @@ export function UpdateFile(d: Folder, data: any): Folder {
     path.forEach(p => {
         current.folders!=null && p in current.folders && (current = current.folders[p])
     })
-    if (current.UUID != data["pUUID"])
-        return dir
     if (current.files == null) current.files = {}
     current.files[data["name"]] = data["data"]
     return dir
 }
 
-export function Delete(root: Folder, pathS: string, isFolder: boolean, pUUID: string): Folder {
+export function Delete(root: Folder, pathS: string, isFolder: boolean): Folder {
     const dir = JSON.parse(JSON.stringify(root));
     let current = dir
     let path = pathS.split("/")
@@ -83,14 +79,33 @@ export function Delete(root: Folder, pathS: string, isFolder: boolean, pUUID: st
     })
     if (isFolder) {
         if (current.folders == null) return dir
-        if (current.folders[fileName] != null && current.folders[fileName].UUID != pUUID)
-            return dir
         delete current.folders[fileName];
     }
     else {
         if (current.files == null) return dir
-        if (current.files[fileName] != null && current.files[fileName].UUID != pUUID)
-            return dir
+        delete current.files[fileName]
+    }
+    return dir;
+}
+
+export function rename(root: Folder, pathS: string, isFolder: boolean, name: string): Folder {
+    const dir = JSON.parse(JSON.stringify(root));
+    let current = dir
+    let path = pathS.split("/")
+    const fileName = path[path.length-1]
+    path = path.slice(0, -1)
+    path.forEach(p => {
+        current.folders!=null && p in current.folders && (current = current.folders[p])
+    })
+    if (isFolder) {
+        if (current.folders == null) return dir
+        current.folders[name] = current.folders[fileName]
+        current.folders[name].name = name
+        delete current.folders[fileName]
+    }
+    else {
+        if (current.files == null) return dir
+        current.files[name] = current.files[fileName]
         delete current.files[fileName]
     }
     return dir;
@@ -117,18 +132,17 @@ const copyFolder = (ref: Folder, UUIDData: {[name: string]: string}) => {
 }
 
 export function Move(root: Folder, from: string, to: string,isFolder: boolean, name: string, 
-        UUIDData: {[name: string]: string}, useUUID: boolean, pUUID: string): Folder {
+        UUIDData: {[name: string]: string}, useUUID: boolean): Folder {
     const dir = JSON.parse(JSON.stringify(root));
     let current = dir
     let path = to.split("/")
     path.forEach(p => {
         current.folders!=null && p in current.folders && (current = current.folders[p])
     })
-    if (current == null) return dir
-    if (current.UUID != pUUID) return dir
+    if (current == null) {console.log('not found');return dir}
     if (isFolder) {
         let folder = getFolder(root, from)
-        if (folder == null) return dir
+        if (folder == null) {console.log('target not found'); return dir}
         if (current.folders == null) current.folders = {}
         if (useUUID)
             folder = copyFolder(folder, UUIDData)

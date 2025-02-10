@@ -6,8 +6,8 @@ export default function (
     setDictionary: Function, id: string, setTabs: Function, setLinkDirectory: Function, data: {path: string, pUUID:string},
         RoleMenu: InfoMenu, setRoleMenu: Function, LinkSocket: WebSocket | null, LiveUpdate: boolean, type: string
 ) {
-    setDictionary((d: Folder) => Delete(d, data["path"], type == "folder", data.pUUID))
-    LiveUpdate && setLinkDirectory((d: Folder) => Delete(d, data["path"], type == "folder", data.pUUID))
+    setDictionary((d: Folder) => Delete(d, data["path"], type == "folder"))
+    LiveUpdate && setLinkDirectory((d: Folder) => Delete(d, data["path"], type == "folder"))
     setTabs((s: string[]) => s.filter(e => e != data["path"]))
     if (RoleMenu.path == data["path"]) setRoleMenu((prev: InfoMenu) => ({
         ...prev,

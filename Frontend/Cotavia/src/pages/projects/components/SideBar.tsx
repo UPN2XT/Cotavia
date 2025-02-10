@@ -1,4 +1,4 @@
-import { DocumentDuplicateIcon, Cog6ToothIcon, HomeIcon, LinkIcon, CommandLineIcon } from "@heroicons/react/16/solid"
+import { DocumentDuplicateIcon, Cog6ToothIcon, LinkIcon, CommandLineIcon, Squares2X2Icon } from "@heroicons/react/16/solid"
 import { Link } from "react-router"
 import { useParams } from "react-router"
 interface useProps {
@@ -29,7 +29,7 @@ export default function(props: useProps) {
     }
 
     const setActive = (x: number) => ("size-9 " + 
-            (props.sideTabIndex == x?"border-l-2 " + (x==0?"border-purple-500": "border-purple-500"):"border-blue-500"))
+            (props.sideTabIndex == x?"border-l-2 " + (x==0?"border-purple-500": "border-blue-500"):""))
 
     return (
         <div className="border-r-2 border-neutral-950 p-2 pt-5 pb-5 flex flex-col justify-between hover:cursor-pointer">
@@ -47,7 +47,7 @@ export default function(props: useProps) {
                     <Cog6ToothIcon className="size-9 hover:-rotate-45"/>
                 </Link>
                 <Link to="../">
-                    <HomeIcon className="size-9" />
+                    <Squares2X2Icon className="size-9" />
                 </Link>
             </div>
         </div>

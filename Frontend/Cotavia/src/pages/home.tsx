@@ -4,7 +4,7 @@ import applicationData from "../data"
 import { Link } from "react-router"
 import CreationScreen from "./components/creationScreen"
 import Nav from "../components/nav"
-import { PlusIcon } from "@heroicons/react/16/solid"
+import { PlusIcon, ArchiveBoxXMarkIcon, Square3Stack3DIcon, InformationCircleIcon } from "@heroicons/react/16/solid"
 interface Projects
 {
     [name: string]: string
@@ -73,6 +73,20 @@ export default function() {
     const [projects, setProjects] = useState<Projects>({})
     const [showCreation, setShowCreation] = useState<boolean>(false)
 
+    const leaveProject = async (id:string) =>  {
+        const body = useCrf()
+        body.append("ID", id)
+        const res = await fetch(applicationData.host+"projects/leave", {method:'POST', body:body})
+        if (res.status != 200) return
+        setProjects(p => {
+            const neo: {[name: string]: string} = {}
+            for (const key in p)
+                if (key != id)
+                    neo[key] = p[key]
+            return neo
+        })
+    }
+
     useEffect(() => {
         const body = useCrf()
         fetch(applicationData.host+"projects/getProjects", {method:'POST', body:body, credentials: 'include'})
@@ -84,32 +98,53 @@ export default function() {
     for (const project in projects)
         projectLinks.push(
             (
-                <Link className={"font-bold col-span-1 h-44 rounded-md p-4 text-xl hover:shadow-inner hover:shadow-neutral-900 "+getRandomColor()}
+                <div className={"font-bold col-span-1 h-44 rounded-md p-4 text-xl hover:shadow-inner hover:shadow-neutral-900 relative group flex "
+                    +getRandomColor()}>
+                    <Link className="relative flex-grow"
                     to={`project/${projects[project]}`}>
-                    {project}
-                </Link>)
+                        {project}
+                    </Link>
+                    <div className="flex w-full h-full absolute inset-0 justify-end items-end p-4 pointer-events-none">
+                            <button className=" hover:bg-white rounded-xl hover:text-black p-1 pointer-events-auto z-40"
+                                title="Leave Project"
+                                onClick={e => {e.preventDefault();leaveProject(project)}}>
+                                <ArchiveBoxXMarkIcon  className="size-10"/>
+                            </button>
+                    </div>
+                </div>
+            )
             )
     return (
-        <>
-            <Nav />
-            <div className="p-4">
-                {showCreation && <CreationScreen setFunction={setShowCreation} />}
-                <h2 className="text-2xl font-bold">
-                    projects
-                </h2>
-                <div className="hover:cursor-pointer grid gap-4 grid-cols-[repeat(auto-fill,minmax(300px,1fr))] p-4">
-                    <div onClick={() => setShowCreation(true)}>
-                        <div className={"font-bold col-span-1 h-44 rounded-md p-4 border-2 border-white text-xl flex justify-between hover:bg-white hover:text-black"}>
-                            <div>
-                                Create New Project
-                            </div>
-                            <PlusIcon className="size-12 self-end"/>
-                        </div>
-                    </div>
-                    {projectLinks}
-                </div>
+        <div className="overflow-y-scroll h-screen flex flex-col">
+            <div className="fixed z-50">
+                <Nav />
             </div>
-        </>
+            <div className="p-2 flex flex-col justify-between flex-grow">
+                <div className="p-4 mt-10">
+                    {showCreation && <CreationScreen setFunction={setShowCreation} />}
+                    <h2 className="text-2xl font-bold flex gap-2 items-center">
+                        <Square3Stack3DIcon className="size-8"/> projects ({projectLinks.length})
+                    </h2>
+                    <div className="hover:cursor-pointer grid gap-4 grid-cols-[repeat(auto-fill,minmax(300px,1fr))] p-4
+                        border-white border-l-2 ml-3">
+                        <div onClick={() => setShowCreation(true)}>
+                            <div className={"font-bold col-span-1 h-44 rounded-md p-4 border-2 border-white text-xl flex justify-between hover:bg-white hover:text-black"}>
+                                <div>
+                                    Create New Project
+                                </div>
+                                <PlusIcon className="size-12 self-end"/>
+                            </div>
+                        </div>
+                        {projectLinks}
+                    </div>
+                </div>
+                <div className="flex justify-end p-2">
+                    <Link to="help" className="flex gap-2">
+                        Help <InformationCircleIcon className="size-6"/>
+                    </Link>
+                </div>
+            </div>   
+        </div>
         
     )
 }

@@ -1,7 +1,7 @@
 import { Outlet } from "react-router"
 import RequestList from "./components/List"
 import { useState } from "react"
-import { HomeIcon } from "@heroicons/react/16/solid"
+import { Squares2X2Icon, LinkIcon, InboxArrowDownIcon, InboxStackIcon, MagnifyingGlassCircleIcon } from "@heroicons/react/16/solid"
 import { Link } from "react-router"
 import Search from "./components/Search"
 export default function() {
@@ -9,34 +9,38 @@ export default function() {
     const [tap, setTap] = useState<number>(0)
 
     return (
-        <div className="p-4 max-h-full flex flex-col gap-4 h-full overflow-scroll">
+        <div className="p-4 max-h-full flex flex-col gap-4 h-full overflow-scroll w-screen">
             <div>
-                <Link to="../" className="flex items-center gap-2">
-                    <HomeIcon className="size-8" />
+                <Link to="../" className="flex items-center gap-2 w-fit">
+                    <Squares2X2Icon className="size-8" />
                     <div className="text-lg">
-                        Home
+                        Codavia
                     </div>
                 </Link>
             </div>
             <Outlet />
-            <div className="flex flex-col gap-4 bg-neutral-800 p-4 rounded-lg flex-grow">
-                <div className="flex border-b-2 border-neutral-950 pb-1 gap-1">
-                    <text className={"text-xl font-semibold p-2 rounded-md hover:cursor-pointer " + (tap == 0? "bg-neutral-900": "")}
+            <div className="flex flex-col gap-4 bg-neutral-800 p-4 rounded-lg flex-grow backdrop-blur-xl bg-opacity-40 drop-shadow-sm shadow-sm shadow-neutral-700">
+                <div className="flex border-b-2 border-neutral-950 pb-1 gap-1 overflow-x-scroll">
+                    <button className={"text-xl font-semibold p-2 rounded-md hover:cursor-pointer hover:bg-neutral-700 flex items-center gap-1 " + (tap == 0? "bg-neutral-800": "")}
                         onClick={() => setTap(0)}>
+                        <LinkIcon className="size-6"/>
                         Connections
-                    </text>
-                    <text className={"text-xl font-semibold p-2 rounded-md hover:cursor-pointer " + (tap == 1? "bg-neutral-900": "")}
+                    </button>
+                    <button className={"text-xl font-semibold p-2 rounded-md hover:cursor-pointer hover:bg-neutral-700 flex items-center gap-1 " + (tap == 1? "bg-neutral-800": "")}
                         onClick={() => setTap(1)}>
+                        <InboxArrowDownIcon className="size-6"/>
                         Incoming
-                    </text>
-                    <text className={"text-xl font-semibold p-2 rounded-md hover:cursor-pointer " + (tap == 2? "bg-neutral-900": "")}
+                    </button>
+                    <button className={"text-xl font-semibold p-2 rounded-md hover:cursor-pointer hover:bg-neutral-700 flex items-center gap-1 " + (tap == 2? "bg-neutral-800": "")}
                         onClick={() => setTap(2)}>
+                        <InboxStackIcon className="size-6"/>
                         Outgoing
-                    </text>
-                    <text className={"text-xl font-semibold p-2 rounded-md hover:cursor-pointer " + (tap == 3? "bg-neutral-900": "")}
+                    </button>
+                    <button className={"text-xl font-semibold p-2 rounded-md hover:cursor-pointer hover:bg-neutral-700 flex items-center gap-1 " + (tap == 3? "bg-neutral-800": "")}
                         onClick={() => setTap(3)}>
+                        <MagnifyingGlassCircleIcon className="size-6"/>
                         Search
-                    </text>
+                    </button>
                 </div>
                 <div className={tap == 0? "visible": "hidden"}>
                     <RequestList mode="c" reload={tap == 0}/>

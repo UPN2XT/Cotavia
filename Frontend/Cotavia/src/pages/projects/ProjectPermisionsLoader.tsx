@@ -10,10 +10,10 @@ import ProjectDataProvider from "./projectDataProvider";
 export default function() {
 
     const [perm, setPerm] = useState<permisions>({
-        isAdmin: false,
-        canCreate: false,
-        canDelete: false,
-        canModifyFiles: false,
+        isAdmin: true,
+        canCreate: true,
+        canDelete: true,
+        canModifyFiles: true,
     })
 
     const [loaded, setLoaded] = useState<boolean>(data.devaloperMode? true: false)

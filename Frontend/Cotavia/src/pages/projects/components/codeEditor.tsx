@@ -72,6 +72,10 @@ export default function(parms: useProps) {
 
     const tabs = parms.Tabs.map(s => <Tab path={s} root={parms.root} setTabs={parms.setTabs} tabs={parms.Tabs}/>)
 
+    const dots: React.ReactNode[] = []
+    for (let i = 0; i < 3; i++)
+        dots.push( <div className={'size-2 m-[0.125rem] rounded-full hover:cursor-pointer ' + ((parms.upToDateData) ? 'bg-yellow-300': 'bg-green-500')}></div>)
+
     return (
         <div className="flex-grow max-h-screen">
             <div className={"flex flex-col h-screen " + (parms.path? "visible": "hidden")}>
@@ -82,17 +86,15 @@ export default function(parms: useProps) {
                             </div>
                             {parms.path != "" && 
                             (
-                            <>
-                                <div className={'size-4 mr-2 rounded-full hover:cursor-pointer ' + ((parms.upToDateData) ? 'bg-yellow-300': 'bg-green-500')}
-                                    onClick={() => {
-                                        if (!parms.upToDateData) 
-                                            return
-                                        parms.setUpToDateData(true)
-                                        parms.updateFunction()
-                                    }}>
-
-                                </div>
-                            </>
+                            <div className='flex pr-2'
+                                onClick={() => {
+                                    if (!parms.upToDateData) 
+                                        return
+                                    parms.setUpToDateData(true)
+                                    parms.updateFunction()
+                                }}>
+                               {dots}
+                            </div>
                         )}
                         </div>
 
@@ -125,9 +127,16 @@ export default function(parms: useProps) {
                 }
 
                 </div>
-                <div className={'h-screen flex flex-grow justify-center items-center ' + (!parms.path? "visible": "hidden")}>
-                        <div className='opacity-20 text-9xl hover:cursor-default font-medium'>
-                            Codavia
+                <div className={'text-9xl hover:cursor-default font-medium h-screen flex flex-grow justify-center items-center opacity-50 ' 
+                        + (!parms.path? "visible": "hidden")}>
+                        <div className='border-t-4 pb-4'>
+                            Cod
+                        </div>
+                        <div>
+                            .
+                        </div>
+                        <div className='border-b-4 pt-12 pb-4'>
+                            avia
                         </div>
                 </div>
             

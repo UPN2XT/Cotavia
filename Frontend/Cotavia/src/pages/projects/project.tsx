@@ -18,6 +18,7 @@ import saveFile from "./scripts/projectManger/saveFile"
 import getFileFromServer from "../Link/scripts/getFile"
 import updateTextCode from "./scripts/projectManger/updateTextCode"
 import { getFile } from "./scripts/Updater"
+import createUUIDPathDic from "./scripts/projectManger/createUUIDPathTree"
 
 export default function() {
 
@@ -30,7 +31,7 @@ export default function() {
         } 
     )
     const {currentPath, ref, setContextInfo, codeText, setCodeText, 
-        contextInfo, MenuInfo, setMenuInfo } = useContext<project>(projectContext)
+        contextInfo, MenuInfo, setMenuInfo, UUIDPathsUpdate, UUIDPaths } = useContext<project>(projectContext)
     const {id} = useParams()
     const [upToDateData, setUpToDateData] = useState<boolean>(true)
     const [sideTabIndex, setSideTabIndex] = useState<number>(-1)
@@ -58,6 +59,7 @@ export default function() {
         const result = await res.json()
         setDictionary(result.filePath)
         setEnableSocket(true)
+        return result.filePath
     }
 
     const UpdateFunction = async (file: FileContainer | null = getFile(dictionary, currentPath)) => {
@@ -70,6 +72,7 @@ export default function() {
     useEffect(() => {
         try {
             updateCode()
+            .then((r) => {UUIDPathsUpdate(createUUIDPathDic(r, ""));document.title = r.name})
         }
         catch {
             if (applicationData.devaloperMode)
@@ -119,7 +122,9 @@ export default function() {
                 nav={nav} 
                 LinkSocket={socket} 
                 LiveUpdate={LiveUpdate} 
-                setLinkDirectory={setLinkDirectory} 
+                setLinkDirectory={setLinkDirectory}
+                UUIDPathsUpdate={UUIDPathsUpdate}
+                UUIDList={UUIDPaths}
             />}
             <ContextMenu x={contextInfo.x} y={contextInfo.y} toggle={contextInfo.toggle} children={contextInfo.children} ref={ref}/>
             <SideBar setFunction={setSideTabIndex} sideTabIndex={sideTabIndex} socket={socket}/>

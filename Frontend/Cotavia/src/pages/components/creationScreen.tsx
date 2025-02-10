@@ -24,7 +24,7 @@ export default function(props: userProps) {
 
     return (
         <div className="fixed inset-0 bg-black bg-opacity-35 backdrop-blur-md h-full w-full 
-                flex justify-center items-center gap-4">
+                flex justify-center items-center gap-4 z-50">
             <div className="rounded-lg w-fit flex flex-col gap-8 items-center backdrop-blur-lg p-12 bg-black bg-opacity-20 shadow-sm shadow-white">
                 <input placeholder="Project name" className="bg-transparent bg-black shadow-inner shadow-violet-400 rounded-2xl p-5 w-96 text-2xl backdrop-blur-xl"
                     value={name} onChange={(e: ChangeEvent<HTMLInputElement>) => setName(e.currentTarget.value)}/>

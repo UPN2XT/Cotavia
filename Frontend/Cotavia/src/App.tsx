@@ -8,7 +8,7 @@ import { useNavigate } from "react-router"
 import data from "./data"
 function App() {
   
-  const [profile, setProfile] = useState<Profile>({Displayname: "", pfp: "", username:""})
+  const [profile, setProfile] = useState<Profile>({Displayname: "VIk", pfp: "https://cdn.iconscout.com/icon/premium/png-256-thumb/pfp-profile-picture-5382083-4495777.png?f=webp", username:"", connections: 0, setFunction:() => {}})
   const [loaded, setLoaded] = useState<boolean>(data.devaloperMode? true: false)
   const nav = useNavigate()
   useEffect(() => {

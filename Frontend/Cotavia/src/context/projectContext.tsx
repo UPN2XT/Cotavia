@@ -23,6 +23,11 @@ export interface codeTextInterface {
 }
 
 
+export interface UUIDPATHS {
+    folders: {[uuid: string]: string}
+    files: {[uuid: string]: string}
+}
+
 export interface project {
     isAdmin: boolean
     currentPath: string
@@ -39,7 +44,9 @@ export interface project {
     setMenuInfo: Function
     offsetH: number,
     codeText: codeTextInterface,
-    setCodeText: Function
+    setCodeText: Function,
+    UUIDPaths: UUIDPATHS
+    UUIDPathsUpdate: Function
 }
 
 const projectContext = createContext<project>({
@@ -73,7 +80,10 @@ const projectContext = createContext<project>({
     setMenuInfo: () => {},
     offsetH: 0,
     codeText: {type: "", data: "", UUID: ""},
-    setCodeText: () => {}
+    setCodeText: () => {},
+    UUIDPaths: {folders: {}, files: {}},
+    UUIDPathsUpdate: () => {}
+
 });
 
 export {projectContext}

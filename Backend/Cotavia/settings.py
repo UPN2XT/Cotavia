@@ -30,20 +30,19 @@ DEBUG = os.getenv("DEBUG", "False") == "True"
 
 
 
-
-
 # Application definition
 
 INSTALLED_APPS = [
     'corsheaders',
     'rest_framework',
-    "daphne",
+    "channels",
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.core',
     'Auth',
     'Coda',
     'projects',
@@ -51,10 +50,11 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+     "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
-     "django.middleware.common.CommonMiddleware",
-    "corsheaders.middleware.CorsMiddleware",
+    "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
@@ -69,6 +69,10 @@ REST_FRAMEWORK = {
 }
 
 CORS_ALLOW_ALL_ORIGINS = True # If this is used then `CORS_ALLOWED_ORIGINS` will not have any effect
+
+CORS_ALLOW_CREDENTIALS = True
+CSRF_TRUSTED_ORIGINS = ["http://localhost:8000"]
+
 
 
 ROOT_URLCONF = 'Cotavia.urls'
@@ -91,6 +95,25 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'Cotavia.wsgi.application'
 
+STORAGES = {
+    "default": {
+        "BACKEND": "storages.backends.azure_storage.AzureStorage",
+        "OPTIONS": {
+            "expiration_secs": 500
+        }
+    },
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+    },
+}
+
+AZURE_ACCOUNT_NAME = os.getenv("AZURE_ACCOUNT_NAME", "default-secret-key")
+AZURE_ACCOUNT_KEY = os.getenv("AZURE_ACCOUNT_KEY", "default-secret-key")
+AZURE_CONTAINER = os.getenv("AZURE_CONTAINER", "default-secret-key")
+AZURE_OVERWRITE_FILES = True
+
+STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
+STATIC_URL = "/static/"
 
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases

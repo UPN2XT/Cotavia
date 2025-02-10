@@ -17,9 +17,16 @@ from .api.settings.Roles.GetUserRoles import GetUsersRole
 from .api.settings.Roles.modifyUserRole import EditUsersRole
 from .api.settings.DirRoles.SwitchVisiblity import SwitchVisiblity
 from .api.settings.DirRoles.EditRelatedRoles import EditRolesDir
+from .api.project.leaveProject import LeaveProject
+from .api.settings.general.getProjectInfo import GetProjectGeneral
+from .api.settings.general.ChangeProjectName import ChangeProjectName
+from .api.settings.general.deleteProject import DeleteProject
+from .api.settings.general.setProjectCreatoruser import ChangeCreatorUser
+from .api.filemanger.rename.Rename import RenameF
 
 urlpatterns = [
     path("get/file", GetFile.GetFile.as_view(), name="getFile"),
+    path("leave", LeaveProject.as_view(), name="leaveProject"),
     path("getProject", GetProject.as_view(), name="getProject"),
     path("getProjects", GetProjects.as_view(), name="getProjects"),
     path("permisions",GetPermisionInfo.as_view(), name="permisions"),
@@ -28,8 +35,8 @@ urlpatterns = [
     path("create/file", CreateFile.as_view(), name="createFile"),
     path("filemanger/move", MoveF.as_view(), name="project/copy"),
     path("filemanger/delete", DeleteF.as_view(), name="project/delete"),
+    path('filemanger/rename', RenameF.as_view(), name='RenameFile'),
     path("updateFile", UpdateFile.UpdateFile.as_view(), name="updateFile"),
-    #path("settings/updateCore", views.UpdateProjectCoreSettings, name="updateProjectCore"),
     path("settings/roles/getRoles", GetRoles.as_view(), name="settings/getRoles"),
     path("settings/roles/updateRole", EditRole.as_view(), name="modifyRoles"),
     path("settings/roles/users/get", GetUsersRole.as_view(), name="usersInRole"),
@@ -38,5 +45,9 @@ urlpatterns = [
     path("settings/users/<str:mode>", UserHandler.as_view(), name="addConnectedUsers"),
     path("roles/dir/get", GetRolesDir.as_view(), name="relatedRoles"),
     path("roles/dir/update", EditRolesDir.as_view(), name="dir/role/update"),
-    path("roles/dir/visiblity", SwitchVisiblity.as_view(), name="changeVisiblity")
+    path("roles/dir/visiblity", SwitchVisiblity.as_view(), name="changeVisiblity"),
+    path("settings/get/generalinfo", GetProjectGeneral.as_view(), name="getProjectData"),
+    path("settings/set/name", ChangeProjectName.as_view(), name="setProjectName"),
+    path("settings/change/creator", ChangeCreatorUser.as_view(), name="changeProjectCreator"),
+    path("settings/delete", DeleteProject.as_view(), name="deleteProject")
 ]

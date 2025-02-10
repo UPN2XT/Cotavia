@@ -1,6 +1,6 @@
 import React, { useState, useRef } from "react"
 import { contextInfo } from "./components/contextMenu" 
-import { projectContext, TransferInfo, InfoMenu } from "../../context/projectContext"
+import { projectContext, TransferInfo, InfoMenu, UUIDPATHS } from "../../context/projectContext"
 import { codeTextInterface } from "../../context/projectContext"
 
 export default function({children}: {children: React.ReactNode}) {
@@ -30,6 +30,8 @@ export default function({children}: {children: React.ReactNode}) {
             FromUUID: ""
         })
 
+    const [UUIDPaths, setUUIDPaths] = useState<UUIDPATHS>({folders: {}, files: {}})
+
     return (
         <projectContext.Provider value={
             {
@@ -48,7 +50,9 @@ export default function({children}: {children: React.ReactNode}) {
                 setMenuInfo: setRoleMenu,
                 offsetH: ref.current?.offsetHeight? ref.current?.offsetHeight: 0,
                 codeText: codeText,
-                setCodeText: setCodeText
+                setCodeText: setCodeText,
+                UUIDPaths: UUIDPaths,
+                UUIDPathsUpdate: setUUIDPaths
             }
         }>
             {children}

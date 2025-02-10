@@ -25,7 +25,6 @@ class UpdateFile(APIView):
         id = serializer.validated_data["ID"]
         UUID = serializer.validated_data["UUID"]
         data = serializer.validated_data["data"]
-        path = serializer.validated_data["path"]
         Type = serializer.validated_data["Type"]
 
         project: Project = getProject(id, request)
@@ -42,17 +41,14 @@ class UpdateFile(APIView):
         target.version = target.version + 1
         target.save()
 
-        *path, name = path.split('/')
-
         sendMessage(project, {
             "event": "update/file",
-            "path": "/".join(path),
             "data": {
                 "version": target.version,
                 "type": Type,
                 "UUID": str(target.UUID)
             },
-            "name": name,
+            "name": target.name,
             "pUUID": str(target.parentFolder.UUID)
         })
 

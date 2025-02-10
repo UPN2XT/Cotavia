@@ -1,30 +1,30 @@
 import applicationData from "../../../data"
 import useCrf from "../../../hooks/useCrf"
-import { useState } from "react"
 import useCreateTextFile from "../../../hooks/useCreateTextFile"
 import useFileUpload from "../../../hooks/useFileUpload"
+import { FolderPlusIcon, DocumentPlusIcon, ArrowUpTrayIcon } from "@heroicons/react/16/solid"
+
 interface useProps{
     id: string,
     rootRef: string,
     toggleFunction: Function
     UUID: string
+    nameVal: string;
 }
 
 export default function(props: useProps) {
-    const [nameVal, setnameVal] = useState<string>("")
 
     const upload = async () => {
         props.toggleFunction()
         const files = await useFileUpload()
         if (files == null) return
         for (const file of files)
-            create(props.rootRef, file.name, file.type, file, true)
+            create(file.name, file.type, file, true)
     }
 
-    const create = (path: string, name: string, type: string, file: File | null, isFile:boolean) => {
+    const create = (name: string, type: string, file: File | null, isFile:boolean) => {
         const body = useCrf()
         body.append('ID', props.id)
-        body.append('path', path)
         body.append('name', name)
         body.append('UUID', props.UUID)
         file && body.append('data', file)
@@ -34,29 +34,43 @@ export default function(props: useProps) {
 
     const createFile = () => {
         props.toggleFunction()
-        const file = useCreateTextFile(nameVal, "...")
-        create(props.rootRef, nameVal, file.type, file, true)
+        const file = useCreateTextFile(props.nameVal, "...")
+        create(props.nameVal, file.type, file, true)
     }
 
     const createFolder = () => {
         props.toggleFunction()
-        create(props.rootRef, nameVal, "", null, false)
+        create(props.nameVal, "", null, false)
     }
 
 
     return (
         <>
-            <input value={nameVal} className="bg-inherit bg-opacity-25 w-full rounded-mdplaceholder:text-sm text-sm p-1" placeholder="name"
-                onChange={e => setnameVal(e.currentTarget.value)}/>
-            <button onClick={createFolder} className="w-full text-lg text-start rounded-md hover:bg-black hover:bg-opacity-15 p-2">
-                    Create Folder
-            </button>
-            <button onClick={createFile} className="w-full text-lg text-start rounded-md hover:bg-black hover:bg-opacity-15 p-2">
-                Create File
-            </button>
-            <button onClick={upload} className="w-full text-lg text-start rounded-md hover:bg-black hover:bg-opacity-15 p-2">
-                Upload
-            </button>
+            <div className="flex justify-between w-full">
+                <button className="w-fit text-lg text-start rounded-md hover:bg-black hover:bg-opacity-15 p-2 flex flex-col items-center"
+                    onClick={createFile}
+                    disabled={props.nameVal==""}>
+                    <DocumentPlusIcon className="size-7"/>
+                    <div className="text-xs">
+                        file
+                    </div>
+                </button>
+                <button className="w-fit text-lg text-start rounded-md hover:bg-black hover:bg-opacity-15 p-2 flex flex-col items-center"
+                     onClick={createFolder}
+                     disabled={props.nameVal==""}>
+                    <FolderPlusIcon className="size-7"/>
+                    <div className="text-xs">
+                        folder
+                    </div>
+                </button>
+                <button className="w-fit text-lg text-start rounded-md hover:bg-black hover:bg-opacity-15 p-2 flex flex-col items-center"
+                    onClick={upload}>
+                    <ArrowUpTrayIcon className="size-7"/>
+                    <div className="text-xs">
+                        upload
+                    </div>
+                </button>
+            </div>
         </>
     )
 }

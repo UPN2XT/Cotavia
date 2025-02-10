@@ -46,7 +46,7 @@ class Folder(models.Model):
         return new_instance
 
 class File(models.Model):
-    project = models.ForeignKey('Project', on_delete=models.CASCADE, default=None)
+    project = models.ForeignKey('Project', on_delete=models.CASCADE, default=None, related_name="projectfiles")
     FileName = models.CharField(max_length=128)
     name = models.CharField(max_length=128, default=FileName)
     parentFolder = models.ForeignKey(Folder, on_delete=models.CASCADE, related_name="childrenfiles", null=True)

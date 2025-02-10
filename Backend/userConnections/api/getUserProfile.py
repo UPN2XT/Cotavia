@@ -12,6 +12,7 @@ class ProfileView(APIView):
             "Displayname": profile.displayName,
             "pfp": profile.pfp.url if profile.pfp else None,
             "username": profile.user.username,
+            "connections": profile.connections.count()
         }
 
     def post(self, request):

@@ -8,8 +8,6 @@ from rest_framework.permissions import IsAuthenticated
 from ....models import Project
 from ...utils.filemanger.GetFunctions import get_file
 from ...utils.common.getProject import getProject, PROJECTNOTFOUND
-from django.http import FileResponse
-from ...utils.common.FileCore import openFile
 
 @method_decorator(csrf_protect, name='dispatch')
 class GetFile(APIView):
@@ -36,5 +34,5 @@ class GetFile(APIView):
             return Response({"error": target}, status=status.HTTP_403_FORBIDDEN)
         
         
-        return FileResponse(openFile(target.data.name))
+        return Response({"url": target.data.url})
 
