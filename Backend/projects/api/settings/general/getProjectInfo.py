@@ -24,7 +24,7 @@ class GetProjectGeneral(APIView):
         if project == None:
             return PROJECTNOTFOUND
         
-        users = project.user.filter(userRoles__isAdmin=True)
+        users = project.user.filter(userRoles__isAdmin=True).distinct()
 
         usersData = users.values_list('username', flat=True)
         

@@ -77,7 +77,11 @@ export default function() {
         const body = useCrf()
         body.append("ID", id)
         const res = await fetch(applicationData.host+"projects/leave", {method:'POST', body:body})
-        if (res.status != 200) return
+        if (res.status != 200) {
+            if (res.status == 409)
+                alert("You need to change the managing user from yourself before leaving the project")
+            return
+        }
         setProjects(p => {
             const neo: {[name: string]: string} = {}
             for (const key in p)
@@ -107,7 +111,7 @@ export default function() {
                     <div className="flex w-full h-full absolute inset-0 justify-end items-end p-4 pointer-events-none">
                             <button className=" hover:bg-white rounded-xl hover:text-black p-1 pointer-events-auto z-40"
                                 title="Leave Project"
-                                onClick={e => {e.preventDefault();leaveProject(project)}}>
+                                onClick={e => {e.preventDefault();leaveProject(projects[project])}}>
                                 <ArchiveBoxXMarkIcon  className="size-10"/>
                             </button>
                     </div>

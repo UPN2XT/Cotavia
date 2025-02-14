@@ -10,7 +10,7 @@ export default function() {
     const [displayname, setDisplayname] = useState<string>(Displayname)
 
     const changePfp = async () => {
-        const file = await useFileUpload()
+        const file = await useFileUpload('image')
         if ((file) == null) return
         const body = useCrf()
         body.append("pfp", file[0])

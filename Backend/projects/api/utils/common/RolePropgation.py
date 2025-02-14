@@ -23,7 +23,7 @@ def changeRoles(f, addedRoles, removedRoles, allowAddPropagation):
 def RolePropgate(parent: Folder, addedRoles, removedRoles, allowAddPropagation=True, Root=False):
     if not Root:
         changeRoles(parent, addedRoles, removedRoles, allowAddPropagation)
-    if parent.limitedVisibility:
+    if parent.limitedVisibility and not Root:
         allowAddPropagation = False
     folders = parent.childrenfolders.all()
     files = parent.childrenfiles.all()

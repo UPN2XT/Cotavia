@@ -8,7 +8,7 @@ import renameEvent from "./renameEvent";
 export default function (
     setDictionary: Function, currentPath: string, setUpToDateData: Function, id: string, codeText: string, setTabs: Function,
         RoleMenu: InfoMenu, setRoleMenu: Function, permisonUpdateFunction: Function, nav: Function, LinkSocket: WebSocket | null, LiveUpdate: boolean,
-        setLinkDirectory: Function, event: MessageEvent<any>, UUIDPathsUpdate: Function, UUIDLIST: UUIDPATHS
+        setLinkDirectory: Function, event: MessageEvent<any>, UUIDPathsUpdate: Function, UUIDLIST: UUIDPATHS, setDeletedFile: Function
 ) {
 
     const data = JSON.parse(event.data)
@@ -46,7 +46,7 @@ export default function (
         else
             data['path'] = UUIDLIST.folders[data['pUUID']].slice(0, -1)
         deleteEvent(setDictionary, id, setTabs, setLinkDirectory, data, RoleMenu, setRoleMenu,
-            LinkSocket,LiveUpdate, parms[1]
+            LinkSocket,LiveUpdate, parms[1], currentPath, setDeletedFile
         )
         return
     }

@@ -9,7 +9,7 @@ export default function (
 ) {
     const x = String(data['path']).split('/').slice(0, -1)
     x.push(data['name'])
-    const loc = x.join('/') + (data['Type'] == 'folder'? '/': '')
+    const loc = (x.join('/')) + (type == 'folder'? '/': '')
     setDictionary((d: Folder) => rename(d, data["path"], type == "folder", data['name']))
     LiveUpdate && setLinkDirectory((d: Folder) => rename(d, data["path"], type == "folder", data['name']))
     setTabs((s: string[]) => 
@@ -24,16 +24,13 @@ export default function (
         toggle: false
     }))
     LiveUpdate && LinkSocket?.send(JSON.stringify({
-        event: "rename",
+        event: `${type}/rename`,
         data: {
             ID: id,
-            type: type,
             path: data["path"],
             name: data['name']
         }
     }))
-
-    
 
     if (type=='folder')
         setUUIDList((prev: UUIDPATHS) => (

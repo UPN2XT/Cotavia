@@ -16,10 +16,14 @@ export default function(props: useProps) {
 
     const upload = async () => {
         props.toggleFunction()
-        const files = await useFileUpload()
+        const files = await useFileUpload('any', true)
         if (files == null) return
-        for (const file of files)
-            create(file.name, file.type, file, true)
+        for (const file of files) {
+            if (file.size <= 12*1024*1024)
+                create(file.name, file.type, file, true)
+            else
+                alert('max upload size is 12 mb')
+        }
     }
 
     const create = (name: string, type: string, file: File | null, isFile:boolean) => {

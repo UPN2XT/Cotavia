@@ -78,3 +78,32 @@ class FileManager:
         except:
             print("File could not be read")
             return None
+
+    import os
+
+    @staticmethod
+    def rename_file(file_path, new_name):
+        """Renames a file given its path and new name."""
+        if not os.path.isfile(file_path):
+            print('File not found')
+            return
+        
+        directory = os.path.dirname(file_path)
+        new_path = os.path.join(directory, new_name)
+
+        os.rename(file_path, new_path)
+        return new_path
+    
+    @staticmethod
+    def rename_folder(folder_path, new_name):
+        """Renames a folder given its path and new name."""
+        if not os.path.isdir(folder_path):
+            print('folder not found')
+            return
+        
+        parent_dir = os.path.dirname(folder_path)
+        new_path = os.path.join(parent_dir, new_name)
+
+        os.rename(folder_path, new_path)
+        return new_path
+

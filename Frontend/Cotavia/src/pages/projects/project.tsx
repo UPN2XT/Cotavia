@@ -45,6 +45,7 @@ export default function() {
     }}>({})
     const {socket, setLinkDirectory, LiveUpdate, LinkDirectory} = useContext<LinkData>(LinkContext)
     const [enableSocket, setEnableSocket] = useState<boolean>(false)
+    const [deletedFile ,setDeletedFile] = useState<boolean>(false)
 
     const nav = useNavigate()
 
@@ -97,18 +98,15 @@ export default function() {
         }
 
     useEffect(() => {
-        pathChange(setCodeText, currentPath, dictionary, setUpToDateData, chache, socket, String(id), UpdateFunction, LinkDirectory)
+        pathChange(setCodeText, currentPath, dictionary, setUpToDateData, chache, socket, String(id), UpdateFunction, LinkDirectory, LiveUpdate)
+        setDeletedFile(false)
     }, [currentPath])
-    
-    useEffect(() => {
-        console.log(LinkDirectory)
-    }, [LinkDirectory])
 
     const setVisiblity = (x:number) => "fixed flex-shrink-0 z-40 h-screen p-2 flex gap-2 " + (sideTabIndex == x? "visible": "hidden")
     
     return (
         <div className="flex h-screen w-screen"
-            onKeyDown={(e: React.KeyboardEvent) => saveFile(e, allowSave, setAllowSave, String(id), currentPath, canModifyFiles, codeText)}>
+            onKeyDown={(e: React.KeyboardEvent) => saveFile(e, allowSave && !deletedFile, setAllowSave, String(id), currentPath, canModifyFiles, codeText)}>
             { enableSocket && <SocketHandler 
                 setDictionary={setDictionary} 
                 currentPath={currentPath} 
@@ -125,6 +123,7 @@ export default function() {
                 setLinkDirectory={setLinkDirectory}
                 UUIDPathsUpdate={UUIDPathsUpdate}
                 UUIDList={UUIDPaths}
+                setDeletedFile={setDeletedFile}
             />}
             <ContextMenu x={contextInfo.x} y={contextInfo.y} toggle={contextInfo.toggle} children={contextInfo.children} ref={ref}/>
             <SideBar setFunction={setSideTabIndex} sideTabIndex={sideTabIndex} socket={socket}/>
@@ -139,7 +138,8 @@ export default function() {
                 </div>
             </div>   
                 <CodeEditor data={codeText} onChange={(value) => setCodeText((prev: codeTextInterface) => ({...prev, data: value? value: ""}))} path={currentPath} upToDateData={!upToDateData}
-                 setUpToDateData={setUpToDateData} Tabs={tabs} setTabs={setTabs} root={dictionary} updateFunction={UpdateFunction}/>
+                 setUpToDateData={setUpToDateData} Tabs={tabs} setTabs={setTabs} root={dictionary} updateFunction={UpdateFunction}
+                 deletedFile={deletedFile}/>
             </div>
          
     )

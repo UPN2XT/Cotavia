@@ -15,7 +15,7 @@ export default function(setDictionary: Function, currentPath: string, setUpToDat
             setUpToDateData(false)
         LiveUpdate && (() => {
             const path = data["path"] == ""? data["name"]: `${data["path"]}/${data["name"]}`
-            getFile(path, id)
+            getFile(data['data']['UUID'], id)
             .then(result => {
                 if (result == null)
                     return

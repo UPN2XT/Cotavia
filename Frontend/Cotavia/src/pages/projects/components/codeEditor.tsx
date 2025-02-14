@@ -3,6 +3,8 @@ import Tab from './Tab';
 import { useEffect } from 'react';
 import { Folder } from './DirectoryViewer';
 import { useRef } from 'react';
+import extensionLanguageMap from './../../../programingLanguages'
+import { DocumentIcon } from '@heroicons/react/16/solid';
 interface useProps
 {
     data: {
@@ -17,39 +19,13 @@ interface useProps
     setTabs: Function
     root: Folder
     updateFunction: Function
+    deletedFile: boolean
 }
 
 export default function(parms: useProps) {
 
     function getLanguageFromPath(path: string) {
         // Mapping file extensions to Monaco-supported languages
-        const extensionLanguageMap: {[name: string]: string} = {
-            js: "javascript",
-            jsx: "javascript",
-            ts: "typescript",
-            tsx: "typescript",
-            py: "python",
-            java: "java",
-            c: "c",
-            cpp: "cpp",
-            cs: "csharp",
-            html: "html",
-            css: "css",
-            scss: "scss",
-            json: "json",
-            xml: "xml",
-            md: "markdown",
-            php: "php",
-            rb: "ruby",
-            go: "go",
-            rs: "rust",
-            swift: "swift",
-            kt: "kotlin",
-            sql: "sql",
-            yaml: "yaml",
-            sh: "shell",
-            txt: "plaintext",
-        };
         if (!path) return "plaintext"
         // Extract the file extension from the path
         const segments = path.split('/');
@@ -57,7 +33,7 @@ export default function(parms: useProps) {
         const fileExtension = fileName.split('.').pop();
         if (!fileExtension) return "plaintext"
         // Return the corresponding language or default to "plaintext"
-        return extensionLanguageMap[fileExtension] || "plaintext";
+        return extensionLanguageMap[`.${fileExtension}`] || "plaintext";
     }
 
     const upperRef = useRef<HTMLDivElement>(null)
@@ -71,10 +47,10 @@ export default function(parms: useProps) {
     }, [parms.path])
 
     const tabs = parms.Tabs.map(s => <Tab path={s} root={parms.root} setTabs={parms.setTabs} tabs={parms.Tabs}/>)
-
+    const x = parms.path.split('/')
     const dots: React.ReactNode[] = []
     for (let i = 0; i < 3; i++)
-        dots.push( <div className={'size-2 m-[0.125rem] rounded-full hover:cursor-pointer ' + ((parms.upToDateData) ? 'bg-yellow-300': 'bg-green-500')}></div>)
+        dots.push( <div className={'size-2 m-[0.125rem] rounded-full hover:cursor-pointer ' + (parms.deletedFile? "bg-red-500": (parms.upToDateData) ? 'bg-yellow-300': 'bg-green-500')}></div>)
 
     return (
         <div className="flex-grow max-h-screen">
@@ -88,7 +64,7 @@ export default function(parms: useProps) {
                             (
                             <div className='flex pr-2'
                                 onClick={() => {
-                                    if (!parms.upToDateData) 
+                                    if (!parms.upToDateData || parms.deletedFile) 
                                         return
                                     parms.setUpToDateData(true)
                                     parms.updateFunction()
@@ -116,12 +92,20 @@ export default function(parms: useProps) {
                                 value={parms.data.data}
                                 onChange={parms.onChange} />
                         </div>
-                    ) : (
+                    ) : parms.data.type.startsWith("text")? (
                         <div className='flex justify-center items-center p-4 flex-grow'
                             style={{
                                 maxHeight: `calc(100vh - ${upperRef.current? upperRef.current.offsetHeight: 0}px)`
                             }}>
                             <img src={parms.data.data}  className='max-w-full max-h-full w-fit rounded-sm'/>
+                        </div>
+                    ) : (
+                        <div className='flex justify-center items-center p-4 flex-grow flex-col gap-4'
+                            style={{
+                                maxHeight: `calc(100vh - ${upperRef.current? upperRef.current.offsetHeight: 0}px)`
+                            }}>
+                            <DocumentIcon className='size-10'/>
+                            <div className='text-2xl'>{x[x.length - 1]}</div>
                         </div>
                     )
                 }

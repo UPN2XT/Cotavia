@@ -6,12 +6,12 @@ import onMessageHandler from "./onMessageHandler";
 interface useProps {
     setDictionary: Function, currentPath: string, setUpToDateData: Function, id: string, codeText: string, setTabs: Function,
     RoleMenu: InfoMenu, setRoleMenu: Function, permisonUpdateFunction: Function, nav: Function, LinkSocket: WebSocket | null, LiveUpdate: boolean,
-    setLinkDirectory: Function, UUIDPathsUpdate: Function, UUIDList: UUIDPATHS
+    setLinkDirectory: Function, UUIDPathsUpdate: Function, UUIDList: UUIDPATHS, setDeletedFile: Function
 }
 
 const socketHandler = ({setDictionary, currentPath, setUpToDateData, id, codeText, setTabs,
     RoleMenu, setRoleMenu, permisonUpdateFunction, nav, LinkSocket, LiveUpdate, UUIDPathsUpdate, UUIDList,
-    setLinkDirectory} : useProps) => {
+    setLinkDirectory, setDeletedFile} : useProps) => {
     
     
     
@@ -33,7 +33,7 @@ const socketHandler = ({setDictionary, currentPath, setUpToDateData, id, codeTex
             if (socket)
                 socket.onmessage = event => onMessageHandler(setDictionary, currentPath, setUpToDateData, 
                     id, codeText, setTabs, RoleMenu, setRoleMenu, permisonUpdateFunction, nav, LinkSocket, 
-                    LiveUpdate, setLinkDirectory, event, UUIDPathsUpdate, UUIDList
+                    LiveUpdate, setLinkDirectory, event, UUIDPathsUpdate, UUIDList, setDeletedFile
                 )
         })
 

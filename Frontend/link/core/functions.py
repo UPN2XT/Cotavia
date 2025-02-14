@@ -38,6 +38,20 @@ def createDir(data, basicData):
         "status": "sucess"
     })
 
+def renameFolder(data, basicData):
+    path = getPath(basicData, data["path"], data["ID"])
+    FileManager.rename_folder(path, data["name"])
+    return json.dumps({
+        "status": "sucess"
+    })
+
+def renameFile(data, basicData):
+    path = getPath(basicData, data["path"], data["ID"])
+    FileManager.rename_file(path, data["name"])
+    return json.dumps({
+        "status": "sucess"
+    })
+
 def createProject(data, basicData):
     loc = os.path.join(basicData["directory"], f'{data["name"]}_{data["ID"]}')
     FileManager.make_dir(loc)

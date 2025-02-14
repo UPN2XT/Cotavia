@@ -95,6 +95,7 @@ export default function() {
                                 <select className="px-3 py-2 bg-neutral-700 rounded-lg"
                                     value={creator}
                                     onChange={e => setCreator(e.target.value)}>
+                                    <option value={""}>Users</option>
                                     {options}
                                 </select>
                                 <button onClick={changeCreator}>

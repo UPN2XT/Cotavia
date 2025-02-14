@@ -12,7 +12,6 @@ export default async function(UUID: string, id: string) {
     const res2 = await fetch(result.url)
     try {
         const results = await res2.blob()
-        console.log("t2")
         return results
     } catch {
         return null

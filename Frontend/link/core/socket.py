@@ -1,7 +1,7 @@
 import json
 import os
 from .functions import getProject, createProject, cut, copy, delete, init, getF
-from .functions import open_terminal_in_new_window,upload, updatePaths, createDir
+from .functions import open_terminal_in_new_window,upload, updatePaths, createDir, renameFile, renameFolder
 
 basicData = {}
 
@@ -23,7 +23,9 @@ functions = {
     "updatePaths": updatePaths,
     "createDir": createDir,
     "open/terminal": open_terminal_in_new_window,
-    "get/file": getF
+    "get/file": getF,
+    "folder/rename": renameFolder,
+    "file/rename": renameFile
 }
 
 async def handler(websocket):
@@ -41,3 +43,5 @@ async def handler(websocket):
                 print("error")
     except:
          print("Connection ended")
+            
+    

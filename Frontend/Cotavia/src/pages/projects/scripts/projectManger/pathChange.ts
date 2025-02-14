@@ -8,7 +8,7 @@ interface cache {
 export default async function(
     setCodeText: Function, currentPath: string, dictionary: Folder, setUpToDateData: Function,
     chache: cache, socket: WebSocket | null, id: string, UpdateFunction: Function,
-    LinkDirectory: Folder | null) {
+    LinkDirectory: Folder | null, LiveUpdate: boolean) {
 
     if (currentPath == "") {
         setCodeText({
@@ -19,6 +19,10 @@ export default async function(
     }
     const file = getFile(dictionary, currentPath)
     if (file != null) {
+        if (!file.type?.startsWith('text') && !file.type?.startsWith('image') && !LiveUpdate) {
+            setCodeText({data: "", type:"any", UUID: ""})
+            return
+        } 
         if (chache[currentPath] != null) {
             setCodeText({data: chache[currentPath].data, type:chache[currentPath].file.type, UUID: chache[currentPath].file.UUID})
             setUpToDateData(chache[currentPath].file.version == file.version)

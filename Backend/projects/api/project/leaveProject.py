@@ -22,6 +22,10 @@ class LeaveProject(APIView):
         project = getProject(id, request)
         if project == None:
             return PROJECTNOTFOUND
+        
+        if project.creatorole.users.filter(username=request.user.username).exists():
+            return Response(status=status.HTTP_409_CONFLICT)
+
         project.user.remove(request.user)
 
         return Response()

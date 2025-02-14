@@ -1,9 +1,10 @@
-import { DocumentTextIcon, CodeBracketIcon, PhotoIcon } from '@heroicons/react/16/solid'
+import { DocumentTextIcon, CodeBracketIcon, PhotoIcon, DocumentIcon } from '@heroicons/react/16/solid'
 import { ReactNode } from 'react'
-import FileContextMenu from './fileContextMenu';
+import FileContextMenu from './fileContextMenu'
 import { useContext } from "react"
 import { project, projectContext } from "../../../context/projectContext"
-import { useParams } from 'react-router';
+import { useParams } from 'react-router'
+import programingLanguages from '../../../programingLanguages'
 interface useProps {
     path: string,
     folder: boolean,
@@ -41,6 +42,18 @@ export default function(props:useProps)  {
         
     }
 
+    const type = !props.folder? (() => {
+        const fileExtension = String(props.name.split('.').pop());
+        if (props.type?.startsWith('text')) {
+            if (programingLanguages[`.${fileExtension}`] != null)
+                return 'code'
+            return 'plain'
+        }
+        if (props.type?.startsWith('image'))
+            return 'image'
+        return 'any'
+    })(): ""
+
     
     return  props.folder ? (  
                 <li className='list-none text-lg'
@@ -53,9 +66,9 @@ export default function(props:useProps)  {
                 onContextMenu={e => handleLeft(e, <FileContextMenu path={props.path} file={true} 
                     id={String(id)} UUID={props.UUID}/>)}>
                 {
-                    props.type != null && (props.type.startsWith("text")? <CodeBracketIcon className='size-5' />:
-                    props.type.startsWith("image")? <PhotoIcon className='size-5' />:
-                    <DocumentTextIcon className='size-5' />)
+                    props.type != null && (type == 'code'? <CodeBracketIcon className='size-5' />: type == 'plain'? <DocumentTextIcon className='size-5' />:
+                    type == 'image'? <PhotoIcon className='size-5' />:
+                    <DocumentIcon className='size-5' />)
                 }
                 {props.name}
             </li>)
