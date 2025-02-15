@@ -18,8 +18,8 @@ from channels.security.websocket import AllowedHostsOriginValidator
 from channels.auth import AuthMiddlewareStack
 from .routing import websocket_urlpatterns
 
-
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'Cotavia.settings')
+settings_module = 'crud.deployment' if 'WEBSITE_HOSTNAME' in os.environ else 'crud.settings'
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', settings_module)
 
 django_asgi_app = get_asgi_application()
 

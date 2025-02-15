@@ -1,5 +1,4 @@
 import json
-import os
 from .functions import getProject, createProject, cut, copy, delete, init, getF
 from .functions import open_terminal_in_new_window,upload, updatePaths, createDir, renameFile, renameFolder
 

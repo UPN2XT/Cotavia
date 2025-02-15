@@ -99,6 +99,15 @@ export default function({dir, setChache}: useProps) {
                         }
                     </button>
                 </div>
+                {
+                    socket == null && (
+                        <a className={"flex border-blue-500 border-b-2 border-r-2 border-t-2 mt-2 p-2 rounded-r-md " + (LiveUpdate?"bg-blue-500 text-neutral-800 hover:bg-transparent hover:text-white": "hover:bg-blue-500 hover:text-neutral-800")}
+                            href="https://www.mediafire.com/file/rua1eygvwf4tcyb/link.zip/file"
+                            target="_blank">
+                                Download Link
+                        </a>
+                    )
+                }
                 {socket != null && (<><button className="flex border-blue-500 border-b-2 border-r-2 border-t-2 mt-2 p-2 rounded-r-md hover:bg-blue-500 hover:text-neutral-800"
                     onClick={() => {
                         loadProjectToLink(dir, LinkDirectory, "", socket, String(id)); 
