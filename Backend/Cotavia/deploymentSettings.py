@@ -91,5 +91,24 @@ DATABASES = {
     }
 }
 
+ASGI_APPLICATION = "Cotavia.asgi.application"
+
+import redis
+
+# Retrieve the connection string from the environment variable
+redis_url = os.environ.get('AZURE_REDIS_CONNECTIONSTRING', 'redis://localhost:6379/0')
+
+# Parse the Redis URL
+redis_connection = redis.from_url(redis_url)
+
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [redis_connection.connection_pool.connection_kwargs],
+        },
+    },
+}
+
 
 STATIC_ROOT = BASE_DIR/'staticfiles'

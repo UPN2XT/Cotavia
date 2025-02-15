@@ -18,7 +18,7 @@ from channels.security.websocket import AllowedHostsOriginValidator
 from channels.auth import AuthMiddlewareStack
 from .routing import websocket_urlpatterns
 
-settings_module = 'Cotavia.deployment' if 'WEBSITE_HOSTNAME' in os.environ else 'Cotavia.settings'
+settings_module = 'Cotavia.deploymentSettings' if 'WEBSITE_HOSTNAME' in os.environ else 'Cotavia.settings'
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', settings_module)
 
 django_asgi_app = get_asgi_application()
