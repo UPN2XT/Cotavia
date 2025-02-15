@@ -11,7 +11,8 @@ import os
 
 from django.core.wsgi import get_wsgi_application
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'Cotavia.settings')
+settings_module = 'Cotavia.deploymentSettings' if 'WEBSITE_HOSTNAME' in os.environ else 'Cotavia.settings'
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', settings_module)
 
 application = get_wsgi_application()
 
