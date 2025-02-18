@@ -11,7 +11,7 @@ SECRET_KEY = os.environ['SECRET_KEY']
 INSTALLED_APPS = [
     'corsheaders',
     'rest_framework',
-    "channels",
+    'daphne',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
