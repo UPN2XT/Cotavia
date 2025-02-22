@@ -100,22 +100,6 @@ AUTHENTICATION_BACKENDS = [
 
 WSGI_APPLICATION = 'Cotavia.wsgi.application'
 
-STORAGES = {
-    "default": {
-        "BACKEND": "storages.backends.azure_storage.AzureStorage",
-        "OPTIONS": {
-            "expiration_secs": 500
-        }
-    },
-    "staticfiles": {
-        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
-    },
-}
-
-AZURE_ACCOUNT_NAME = os.getenv("AZURE_ACCOUNT_NAME", "default-secret-key")
-AZURE_ACCOUNT_KEY = os.getenv("AZURE_ACCOUNT_KEY", "default-secret-key")
-AZURE_CONTAINER = os.getenv("AZURE_CONTAINER", "default-secret-key")
-AZURE_OVERWRITE_FILES = True
 
 STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
 STATIC_URL = "/static/"

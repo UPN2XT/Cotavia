@@ -56,6 +56,7 @@ AZURE_ACCOUNT_NAME = os.getenv("AZURE_ACCOUNT_NAME", "default-secret-key")
 AZURE_ACCOUNT_KEY = os.getenv("AZURE_ACCOUNT_KEY", "default-secret-key")
 AZURE_CONTAINER = os.getenv("AZURE_CONTAINER", "default-secret-key")
 AZURE_OVERWRITE_FILES = True
+
 ROOT_URLCONF = 'Cotavia.urls'
 
 TEMPLATES = [

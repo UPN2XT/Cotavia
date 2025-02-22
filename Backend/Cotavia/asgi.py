@@ -23,6 +23,23 @@ os.environ.setdefault('DJANGO_SETTINGS_MODULE', settings_module)
 
 django_asgi_app = get_asgi_application()
 
+STORAGES = {
+    "default": {
+        "BACKEND": "storages.backends.azure_storage.AzureStorage",
+        "OPTIONS": {
+            "expiration_secs": 500
+        }
+    },
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+    },
+}
+
+AZURE_ACCOUNT_NAME = os.getenv("AZURE_ACCOUNT_NAME", "default-secret-key")
+AZURE_ACCOUNT_KEY = os.getenv("AZURE_ACCOUNT_KEY", "default-secret-key")
+AZURE_CONTAINER = os.getenv("AZURE_CONTAINER", "default-secret-key")
+AZURE_OVERWRITE_FILES = True
+
 application = ProtocolTypeRouter({
     "http": django_asgi_app,
     "websocket": 
